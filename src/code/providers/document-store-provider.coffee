@@ -41,7 +41,7 @@ DocumentStoreAuthorizationDialog = React.createFactory React.createClass
 class DocumentStoreProvider extends ProviderInterface
 
   constructor: (@options = {}, @client) ->
-    @options.deprecationPhase = 0 if not @options.deprecationPhase?
+    @options.deprecationPhase = 3
     super
       name: DocumentStoreProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.DOCUMENT_STORE')
@@ -189,15 +189,16 @@ class DocumentStoreProvider extends ProviderInterface
       @options.deprecationPhase < 3
 
   deprecationMessage: ->
-    messages = [
-      tr '~CONCORD_CLOUD_DEPRECATION.SAVE_PHASE_1'
-      tr '~CONCORD_CLOUD_DEPRECATION.SAVE_PHASE_2'
-      tr '~CONCORD_CLOUD_DEPRECATION.SAVE_PHASE_3'
-    ]
-    if @options.deprecationPhase > 0 and @options.deprecationPhase <= messages.length
-      messages[@options.deprecationPhase - 1]
-    else
-      null
+    """
+      <div style="text-align: left">
+        <p style="margin: 10px 0;">
+          <strong>#{tr ~CONCORD_CLOUD_DEPRECATION.SHUT_DOWN_MESSAGE}</strong>
+        </p>
+        <p style="margin: 10px 0;">
+          #{tr ~CONCORD_CLOUD_DEPRECATION.PLEASE_SAVE_ELSEWHERE}
+        </p>
+      </div>
+    """
 
   onProviderTabSelected: (capability) ->
     if capability is 'save' and @deprecationMessage()

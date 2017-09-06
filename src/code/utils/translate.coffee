@@ -1,5 +1,5 @@
 translations =  {}
-translations['en'] = require './lang/en-us'
+translations['en'] = require './lang/en-us.json'
 defaultLang = 'en'
 varRegExp = /%\{\s*([^}\s]*)\s*\}/g
 
