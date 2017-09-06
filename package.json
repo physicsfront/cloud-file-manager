@@ -47,7 +47,7 @@
   },
   "scripts": {
     "build": "gulp clean-and-build",
-    "build:codap": "gulp clean-and-build --dest ../codap/apps/dg/english.lproj/cloud-file-manager --codap --nojQuery --noReact --noMap",
+    "build:codap": "gulp clean-and-build --dest ../codap/apps/dg/resources/cloud-file-manager --codap --nojQuery --noReact --noMap",
     "build:watch": "gulp",
     "deploy": "gulp deploy",
     "poeditor:pull:comment": "echo Usage: `npm run poeditor:pull -- -a <your_poeditor_api_key>`",
