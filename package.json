@@ -40,6 +40,7 @@
     "package-json-versionify": "^1.0.1",
     "require-dir": "^0.3.2",
     "run-sequence": "^1.1.5",
+    "strip-json-comments-cli": "^1.0.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^3.6.0"
@@ -49,6 +50,10 @@
     "build:codap": "gulp clean-and-build --dest ../codap/apps/dg/english.lproj/cloud-file-manager --codap --nojQuery --noReact --noMap",
     "build:watch": "gulp",
     "deploy": "gulp deploy",
+    "poeditor:pull:comment": "echo Usage: `npm run poeditor:pull -- -a <your_poeditor_api_key>`",
+    "poeditor:pull": "./bin/poeditor-pull-project.sh",
+    "poeditor:push:comment": "echo Usage: `npm run poeditor:push -- -a <your_poeditor_api_key>`",
+    "poeditor:push": "./bin/poeditor-push-project.sh",
     "serve": "live-server --open=dist/examples"
   }
 }
