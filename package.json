@@ -50,10 +50,11 @@
     "build:codap": "gulp clean-and-build --dest ../codap/apps/dg/resources/cloud-file-manager --codap --nojQuery --noReact --noMap",
     "build:watch": "gulp",
     "deploy": "gulp deploy",
-    "poeditor:pull:usage": "echo Usage: `npm run poeditor:pull -- -a <your_poeditor_api_key>`",
-    "poeditor:pull": "./bin/poeditor-pull-project.sh",
-    "poeditor:push:usage": "echo Usage: `npm run poeditor:push -- -a <your_poeditor_api_key>`",
-    "poeditor:push": "./bin/poeditor-push-project.sh",
+    "strings:build": "./node_modules/.bin/strip-json-comments src/code/utils/lang/en-US-master.json > src/code/utils/lang/en-US.json",
+    "strings:pull:usage": "echo Usage: `npm run strings:pull -- -a <poeditor_api_key>`",
+    "strings:pull": "./bin/strings-pull-project.sh",
+    "strings:push:usage": "echo Usage: `npm run strings:push -- -a <poeditor_api_key>`",
+    "strings:push": "./bin/strings-push-project.sh",
     "serve": "live-server --open=dist/examples"
   }
 }
