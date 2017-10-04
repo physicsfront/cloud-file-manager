@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy
+
+build:
+  type: build
+  script:
+    - sudo ~gitlab-runner/scr/dispatch dev
+  only:
+    - master
+
+staging:
+  type: deploy
+  script:
+    - sudo ~gitlab-runner/scr/dispatch stg
+  only:
+    - tags
+  except:
+    - branches
+
+production:
+  type: deploy
+  script:
+    - sudo ~gitlab-runner/scr/dispatch pro
+  only:
+    - /release$/
+  except:
+    - branches
