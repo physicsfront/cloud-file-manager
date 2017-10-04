@@ -1,4 +1,4 @@
-shell:=/bin/bash
+SHELL:=/bin/bash
 PATHREGEX:=(:|^)\./node_modules/\.bin(:|$$)
 ifeq "$(shell [[ $$PATH =~ $(PATHREGEX) ]] && echo 'y' || echo 'n' )" "n"
 	export PATH:=./node_modules/.bin:$(PATH)
