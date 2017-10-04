@@ -19,3 +19,6 @@ deploy: rebuild
 
 watch:
 	gulp watch
+
+live-server: build
+	live-server --open=dist/examples
