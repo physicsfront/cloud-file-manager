@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <script src="../js/globals.js"></script>
+    <script src="../js/app.js"></script>
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+      body {
+        font-family: 'Arial', 'Helvetica', 'sans-serif'
+      }
+      textarea {
+        width: 100%;
+        height:300px;
+      }
+      #buttons {
+        margin-top: 10px;
+      }
+    </style>
+    <script type="text/javascript">
+      var cfmClient, cfmContent;
+
+      // Disable "Expected an assignment or function call and instead saw an expression" warning
+      /*jshint -W030 */
+      function newFile() {
+        cfmClient && cfmClient.newFileDialog();
+      }
+
+      function openFile() {
+        // no callback for open - we will handle it in the clientInit event callback
+        cfmClient && cfmClient.openFileDialog();
+      }
+
+      function saveFile() {
+        cfmClient && cfmClient.save();
+      }
+
+      function saveFileAs() {
+        cfmClient && cfmClient.saveFileAsDialog(getContent());
+      }
+
+      function getContent() {
+        cfmContent = document.getElementById("text").value;
+        return cfmContent;
+      }
+
+      function setContent(_cfmContent) {
+        cfmContent = _cfmContent;
+        document.getElementById("text").value = cfmContent;
+      }
+
+      function connected(client) {
+        cfmClient = client;
+        cfmContent = document.getElementById("text").value;
+      }
+
+      function changed() {
+        cfmClient.dirty();
+      }
+
+      function focus() {
+        document.getElementById("text").focus();
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Demo App</h2>
+    <p>
+      This simple demo app uses the textarea below to edit text files.  You can either use the menu bar or the buttons below to open, save and create new files.
+    </p>
+    <div>
+      <textarea cols="50" rows="10" id="text"></textarea>
+    </div>
+    <div id="buttons">
+      <button onclick="newFile()">New</button>
+      <button onclick="openFile()">Open</button>
+      <button onclick="saveFile()">Save</button>
+      <button onclick="saveFileAs()">Save As</button>
+    </div>
+    <script type="text/javascript">
+      var clientOptions = {
+        mimeType: "text/plain",
+        appName: "CFM_Demo",
+        appVersion: "0.1",
+        appBuildNum: "1",
+        providers: [
+          "localStorage",
+          {
+            "name": "readOnly",
+            "json": {
+              "first-example": "This is the first readonly example",
+              "second-example": "This is the second readonly example"
+            }
+          },
+          {
+            "name": "googleDrive",
+            "mimeType": "text/plain",
+            "clientId": "1095918012594-svs72eqfalasuc4t1p1ps1m8r9b8psso.apps.googleusercontent.com"
+          },
+          {
+            "name": "documentStore",
+            "patch": true
+          }
+        ]
+      };
+      CloudFileManager.init(clientOptions);
+      CloudFileManager.clientConnect(function (event) {
+        console.log(event);
+        switch (event.type) {
+          case 'connected':
+            connected(event.data.client);
+            break;
+
+            case 'getContent':
+              event.callback(getContent());
+              break;
+
+            case 'newedFile':
+            case 'openedFile':
+              setContent(event.data.content);
+              if(event.callback) event.callback();
+              focus();
+              break;
+        }
+      });
+
+      document.getElementById("text").focus();
+    </script>
+  </body>
+</html>
