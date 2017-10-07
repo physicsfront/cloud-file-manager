@@ -70,7 +70,35 @@
   <body>
     <h2>UKDE-CFM Demo App</h2>
     <p>
-      This simple demo shows the workflow of ukde-cfm that loads and saves codap files in ukde.  A unique file is assigned for each user per each file type available; a user is not allowed to own two or more documents for a given file type.  File type refers to certain pre-set activity type, and the file type for this demo is &ldquo;rampgame.&rdquo;
+    This simple demo explicitly shows the workflow of <tt>ukde-cfm</tt> that
+    loads and saves codap files in ukde.
+      <ul>
+         <li>The workflow shown here and the underlying file service provided
+            by <tt>ukde-cfm</tt> are to be <i>hidden</i> in the production
+            version of UKDE.
+            <ul><tt>ukde-cfm</tt> is degined to serve files when users of
+               UKDE are playing some demo educational games/activities based
+               on CODAP while they are visiting the UKDE webiste.  In such a
+               situation, we want the file creation/saving/update mechanism
+               to be completely automatic and <i>not</i> to require any user
+               action or clear awareness.
+            </ul>
+         </li>
+         <li>A file is created automatically and assigned to a user if the
+            user starts a CODAP activity for the first time.  The type of
+            CODAP activity defines the file type.
+         </li>
+         <li>User is not allowed to own two or more documents for a given
+            file type.  At most one file can be owned by a user.
+         </li>
+         <li>User may be allowed to reload the document, to restart the
+            activity from clean slate.
+         </li>
+         <li>User is not allowed to delete the document, once it is created.
+            This behavior may change in the future.
+         </li>
+      </ul>
+      The file type for this demo is &ldquo;rampgame.&rdquo;
     </p>
     <div>
       <textarea cols="50" rows="10" id="text"></textarea>
