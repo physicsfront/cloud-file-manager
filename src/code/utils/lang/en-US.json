@@ -32,6 +32,7 @@
   "~PROVIDER.READ_ONLY": "Read Only",
   "~PROVIDER.GOOGLE_DRIVE": "Google Drive",
   "~PROVIDER.DOCUMENT_STORE": "Concord Cloud",
+  "~PROVIDER.UKDE": "UKDE at PF",
   "~PROVIDER.LOCAL_FILE": "Local File",
 
   "~FILE_STATUS.SAVING": "Saving...",

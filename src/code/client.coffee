@@ -9,6 +9,7 @@ ReadOnlyProvider = require './providers/readonly-provider'
 GoogleDriveProvider = require './providers/google-drive-provider'
 LaraProvider = require './providers/lara-provider'
 DocumentStoreProvider = require './providers/document-store-provider'
+UkdeProvider = require './providers/ukde-provider'
 DocumentStoreShareProvider = require './providers/document-store-share-provider'
 LocalFileProvider = require './providers/local-file-provider'
 URLProvider = require './providers/url-provider'
@@ -39,7 +40,7 @@ class CloudFileManagerClient
 
     # filter for available providers
     allProviders = {}
-    for Provider in [ReadOnlyProvider, LocalStorageProvider, GoogleDriveProvider, LaraProvider, DocumentStoreProvider, LocalFileProvider]
+    for Provider in [ReadOnlyProvider, LocalStorageProvider, GoogleDriveProvider, LaraProvider, DocumentStoreProvider, UkdeProvider, LocalFileProvider]
       if Provider.Available()
         allProviders[Provider.Name] = Provider
 
@@ -78,7 +79,7 @@ class CloudFileManagerClient
           @alert "Unknown provider: #{providerName}"
     @_setState
       availableProviders: availableProviders
-      shareProvider: new DocumentStoreShareProvider(@, @providers[DocumentStoreProvider.Name])
+      shareProvider: if @providers[DocumentStoreProvider.Name] then new DocumentStoreShareProvider(@, @providers[DocumentStoreProvider.Name]) else null
 
     @appOptions.ui or= {}
     @appOptions.ui.windowTitleSuffix or= document.title
