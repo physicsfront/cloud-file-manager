@@ -73,29 +73,39 @@
     This simple demo explicitly shows the workflow of <tt>ukde-cfm</tt> that
     loads and saves codap files in ukde.
       <ul>
-         <li>The workflow shown here and the underlying file service provided
+         <li>
+            The workflow shown here and the underlying file service provided
             by <tt>ukde-cfm</tt> are to be <i>hidden</i> in the production
             version of UKDE.
-            <ul><tt>ukde-cfm</tt> is degined to serve files when users of
-               UKDE are playing some demo educational games/activities based
-               on CODAP while they are visiting the UKDE webiste.  In such a
+            <ul>
+               <tt>ukde-cfm</tt> is degined to serve files when users of UKDE
+               are playing some demo educational games/activities based on
+               CODAP while they are visiting the UKDE webiste.  In such a
                situation, we want the file creation/saving/update mechanism
                to be completely automatic and <i>not</i> to require any user
-               action or clear awareness.
+               action or awareness.
             </ul>
          </li>
-         <li>A file is created automatically and assigned to a user if the
+         <li>
+            A file is created automatically and assigned to a user if the
             user starts a CODAP activity for the first time.  The type of
             CODAP activity defines the file type.
          </li>
-         <li>User is not allowed to own two or more documents for a given
-            file type.  At most one file can be owned by a user.
+         <li>
+            User is not allowed to own two or more documents for a given file
+            type.  At most one file can be owned by a user per file type.
          </li>
-         <li>User may be allowed to reload the document, to restart the
-            activity from clean slate.
+         <li>
+            User may be allowed to reload the default document of a given
+            file type (see "Load Default" button below), to restart the
+            activity from a clean slate.
          </li>
-         <li>User is not allowed to delete the document, once it is created.
-            This behavior may change in the future.
+         <li>
+            User is not allowed to delete the document, once it is created.
+            Reloading the default document can be regarded as practically the
+            same as &ldquo;deleting the document.&rdquo;  User's activity
+            will pick up where it is left off the last time, if user logs
+            in again later.
          </li>
       </ul>
       The file type for this demo is &ldquo;rampgame.&rdquo;
