@@ -68,44 +68,51 @@
     </script>
   </head>
   <body>
-    <h2>UKDE-CFM Demo App</h2>
+    <h2>UKDE-CFM Demo</h2>
     <p>
-    This simple demo explicitly shows the workflow of <tt>ukde-cfm</tt> that
-    loads and saves codap files in ukde.
+    This simple page demoes the workflow of the <tt>ukde</tt> document
+    provider of <tt>ukde-cfm</tt>.
       <ul>
          <li>
-            The workflow shown here and the underlying file service provided
-            by <tt>ukde-cfm</tt> are to be <i>hidden</i> from user's view in
-            the production version of UKDE.
+            The workflow and the nature of <tt>ukde</tt> service demoed and
+            explained here are to be <i>hidden</i> from user's view in the
+            production version of UKDE.
             <ul>
-               <tt>ukde-cfm</tt> is degined to serve files when users of UKDE
-               are playing some demo educational games/activities based on
-               CODAP while they are visiting the UKDE webiste.  In such a
+               Here is the reason.  The <tt>ukde</tt> document provider of
+               <tt>ukde-cfm</tt> is designed to serve files when UKDE users
+               are playing some demo educational games/activities hosted in
+               CODAP while they are still in UKDE website.  In this
                situation, we want the file creation/saving/update mechanism
-               to be completely automatic and <i>not</i> to require any user
-               action or awareness.
+               to be completely automatic and <i>not</i> to require any
+               explicit user action or user awareness of the underlying
+               process.
             </ul>
          </li>
          <li>
-            A file is created automatically and assigned to a user if the
-            user starts a CODAP activity for the first time.  The type of
-            CODAP activity defines the file type.
+            A file is created automatically and assigned to a user if user
+            starts a CODAP activity in UKDE for the first time.  Each
+            distinct CODAP activity hosted in UKDE defines a unique
+            &ldquo;file type.&rdquo;
          </li>
          <li>
-            User is not allowed to own two or more documents for a given file
+            User is not allowed to own two or more documents of a given file
             type.  At most one file can be owned by a user per file type.
          </li>
          <li>
-            User may be allowed to reload the default document of a given
-            file type (see "Load Default" button below), to restart the
-            activity from a clean slate.
+            User document is autosaved whenever <tt>ukde</tt> is notified of
+            any change to save.  So, when user logs out of UKDE and logs in
+            again later, the activity continues right where it was left off.
+            (How about an anonymous user?  Give a one-time only document?)
          </li>
          <li>
-            User is not allowed to delete the document, once it is created.
-            Reloading the default document can be regarded as practically the
-            same as &ldquo;deleting the document.&rdquo;  User's activity
-            will pick up where it is left off the last time, if user logs
-            in again later.
+            User may be allowed to reload the default document of a given
+            file type (see "Load Default" button below), if user wishes to
+            restart the activity from a clean slate.
+         </li>
+         <li>
+            User is not allowed to delete document.  However, as user can
+            reload the default document, deleting a document is not really
+            necessary.
          </li>
       </ul>
       The file type for this demo is &ldquo;rampgame.&rdquo;
