@@ -5,8 +5,8 @@ which is the (only) document provider that UKDE at PF requires or uses.  All
 other document providers are left intact, while they are not used by UKDE.
 
 The (informal) specification of `ukde` document provider can be gleaned from
-the document `{dist,src}/examples/ukde.html` ([click
-here](src/examples/ukde.html)).
+the document `src/assets/examples/ukde.html` ([click
+here](src/assets/examples/ukde.html)).
 
 # Development and deployment
 
