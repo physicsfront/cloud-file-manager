@@ -347,7 +347,9 @@ class CloudFileManagerClient
   saveFileNoDialog: (stringContent, metadata, callback = null) ->
     @_setState
       saving: metadata
+    # console.log "saveFileNoDialog 0: stringContent = '#{stringContent}'"
     currentContent = @_createOrUpdateCurrentContent stringContent, metadata
+    # console.log "saveFileNoDialog 1: stringContent = '#{stringContent}'"
     metadata.provider.save currentContent, metadata, (err, statusCode) =>
       if err
         # disable autosave on save failure; clear "Saving..." message

@@ -25,9 +25,12 @@ deploy: rebuild
 	@echo '      However, this script is intentionally not doing anything for deploy per se,'
 	@echo '      which needs to be taken care of by gitlab-ci instead.'
 
-# Experience seems to indicate that "gulp watch" is not very robust.
-watch:
+watch: build
 	gulp watch
 
-live:
-	live-server --open=dist/examples
+# Both "live-server" and "gulp watch" watch files.  Make sure that they are
+# not watching the same folder(s).  In such a case, it has been observed that
+# "gulp watch" drops out (after couple of initial successes) silently.
+live: build
+	live-server --open=examples dist &
+	gulp watch
