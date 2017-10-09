@@ -234,6 +234,8 @@
         for (const event_name of ["input", "keyup", "paste"])
           w.addEventListener (event_name, checkCC)
       })("text")
+      // file should be opened automatically; metadata will be  non-null.
+      openFile ()
     </script>
     <!-- >>> -->
   </body>
