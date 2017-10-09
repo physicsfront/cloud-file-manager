@@ -200,7 +200,6 @@ class GoogleDriveProvider extends ProviderInterface
       provider: @
       providerData:
         id: openSavedParams
-    console.log "openSaved is called: #{openSavedParams}"
     @load metadata, (err, content) ->
       callback err, content, metadata
 

@@ -5,5 +5,8 @@ dist/
 # Packages folder.
 node_modules/
 
+# Private scripts
+_scr/
+
 # OS or Editor folders
 .DS_Store
