@@ -23,7 +23,8 @@ In order to see `UKDE-CFM` in action, two web sites can be visited.
 
 * https://ukde-dev.physicsfront.com/user/ucfm-test :  This is one of the
   pages where `UKDE-CFM` is intended for.  This site works now and also in
-  the future as the software gets more fully featured.
+  the future as the software gets more fully featured.  In order to access
+  this page, one must have an account in UKDE.
 
 # Original README file
 
