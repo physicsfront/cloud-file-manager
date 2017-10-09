@@ -4,9 +4,11 @@ This version of cloud file manager includes the `ukde` document provider,
 which is the (only) document provider that UKDE at PF requires or uses.  All
 other document providers are left intact, while they are not used by UKDE.
 
-The (informal) specification of `ukde` document provider can be gleaned from
-the document `src/assets/examples/ukde.html` ([click
-here](src/assets/examples/ukde.html)).
+The (somewhat evolving) specification of `ukde` document provider can be
+gleaned from the html document
+[src/assets/examples/ukde.html](src/assets/examples/ukde.html) ([deployed
+page is here for better
+readability](https://physicsfront.com/cfm-dev/examples/ukde.html)).
 
 # Development and deployment
 

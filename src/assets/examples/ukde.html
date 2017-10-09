@@ -134,29 +134,32 @@
         <li>
           User is not allowed to own two or more documents of a given file
           type.  At most one file can be owned by a user per file type.
-          If user tries to open the same document in multiple places, then
-          only the first instance will run.  However, later instances may be
-          given an option to override and take over the session (TBD).
+          If user tries to open the same document in multiple clients, then
+          only the first client will be able to run the document.  However,
+          later client instances may be given an option to override and take
+          over the session (TBD).
         </li>
         <li>
           User document is autosaved whenever <tt>ukde</tt> is notified of
           any change to save.  So, when user logs out of UKDE and logs in
-          again later, the activity continues right where it was left off.
-          (How about an anonymous user?  Give a one-time only document?)
+          again later, the activity will continue right where it was left
+          off.  (How about an anonymous user?  Give a one-time only
+          document?)
           <ul>
             <li>
-              In this demo, the autosave mechanism is <i>not</i> implemented.
-              Rather, this demo shows how it recognizes that there are
-              changes in the content or not (the "Save" button will become
-              clickable, only if there are).  In the production software, the
-              code will just save the data instead of notifying the user to
-              save.
+              In this demo, this autosave mechanism is <i>not</i>
+              implemented.  Rather, this demo shows how it recognizes that
+              there are saveable changes in the content or not (the "Save"
+              button will become clickable, only if there are).  In the
+              production software, there will be no "Save" button like in
+              this demo and the code will just save the data instead of
+              notifying the user to save.
             </li>
             <li>
               Also, in this demo, the changes in content are ephemeral
               between sessions, as the test content below is actually
-              <i>not</i> saved in the data base yet.  The changes are
-              recognized within a session, but not between sessions.
+              <i>not</i> saved in any persistent data base yet.  The changes
+              are recognized within a session, but not between sessions.
             </li>
           </ul>
         </li>
