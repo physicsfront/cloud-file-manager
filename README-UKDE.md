@@ -15,6 +15,16 @@ the original cloud file manger.  First, it adds `GNUmakefile`, which collects
 and manages all commands used by `UKDE-CFM`.  Second, the deployment is
 performed using Gitlab CI (`.gitlab-ci.yml`).
 
+In order to see `UKDE-CFM` in action, two web sites can be visited.
+
+* https://physicsfront.com/cfm-dev/examples/ukde.html : This standalone
+  website is OK for now, but it will stop being functional for the final
+  version.
+
+* https://ukde-dev.physicsfront.com/user/ucfm-test :  This is one of the
+  pages where `UKDE-CFM` is intended for.  This site works now and also in
+  the future as the software gets more fully featured.
+
 # Original README file
 
 It is `readme.md` file.  [It can be opened here](readme.md).

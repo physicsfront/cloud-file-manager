@@ -134,22 +134,32 @@
         <li>
           User is not allowed to own two or more documents of a given file
           type.  At most one file can be owned by a user per file type.
+          If user tries to open the same document in multiple places, then
+          only the first instance will run.  However, later instances may be
+          given an option to override and take over the session (TBD).
         </li>
         <li>
           User document is autosaved whenever <tt>ukde</tt> is notified of
           any change to save.  So, when user logs out of UKDE and logs in
           again later, the activity continues right where it was left off.
           (How about an anonymous user?  Give a one-time only document?)
-        </li>
           <ul>
-          <i>Note:</i> In this demo, the autosave is <i>not</i> implemented.
-          Rather the demo shows how the system recognizes that there are
-          contents to be saved or not (the "Save" button will become
-          clickable).  It would be straightforward for the code to just save
-          instead of notifying the user to save.  Also, in this demo, the
-          changed file content is ephemeral (the content is not saved in the
-          data base, just yet).
+            <li>
+              In this demo, the autosave mechanism is <i>not</i> implemented.
+              Rather, this demo shows how it recognizes that there are
+              changes in the content or not (the "Save" button will become
+              clickable, only if there are).  In the production software, the
+              code will just save the data instead of notifying the user to
+              save.
+            </li>
+            <li>
+              Also, in this demo, the changes in content are ephemeral
+              between sessions, as the test content below is actually
+              <i>not</i> saved in the data base yet.  The changes are
+              recognized within a session, but not between sessions.
+            </li>
           </ul>
+        </li>
         <li>
           User is allowed to reload the default document of a given file type
           (see "Load Default" button below), if user wishes to restart the
