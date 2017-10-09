@@ -1,4 +1,4 @@
-# /bin/bash required!
+# bash required!
 SHELL:=/bin/bash
 # Make "./node_modules/bin" the first path entry if it is not already in PATH.
 PATHREGEX:=(:|^)\./node_modules/\.bin(:|$$)
@@ -21,9 +21,9 @@ clean:
 
 deploy: rebuild
 	@echo ''
-	@echo 'NOTE: If you are seeing this message, the rebuild must have been completed.'
-	@echo '      However, this script is intentionally not doing anything for deploy per se,'
-	@echo '      which needs to be taken care of by gitlab-ci instead.'
+	@echo 'NOTE: If you are seeing this message, then rebuild must have succeeded.'
+	@echo '      However, this script is intentionally not doing anything for deployment'
+	@echo '      per se, as it will/should be taken care of by gitlab-ci instead.'
 
 watch: build
 	gulp watch
