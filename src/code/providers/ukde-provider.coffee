@@ -1,4 +1,5 @@
 tr = require '../utils/translate'
+isString = require '../utils/is-string'
 
 ProviderInterface = (require './provider-interface').ProviderInterface
 cloudContentFactory = (require './provider-interface').cloudContentFactory
@@ -15,6 +16,7 @@ class UkdeProvider extends ProviderInterface
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
     @DefaultContent = UkdeProvider._defaultContent
+    @_getJWTUCFM()
     # TODO: load _lastSavedContent from UKDE
     @_lastSavedContent = ""
     super
@@ -34,9 +36,68 @@ class UkdeProvider extends ProviderInterface
   @Name: 'ukde'
   @_defaultContent: 'This is the default text.'
 
+  # Hidden in closure; should not be leaked outside this script.
+  _JWTUCFM = undefined
+
+  ##
+  # Call this method without any argument to initialize _JWTUCFM and
+  # @_originA.  If originA is already known, then call this method with that
+  # as argument.
+  #
+  # This method does not do anything on failure.  On success, it will set
+  # _JWTUCFM and, if no argument was given, @_originA.  So, these variables
+  # will persist over any failed attempt to call this method.
+  _getJWTUCFM: (originA) ->
+    update_originA = false
+    if originA
+      if isString originA
+        originA = [originA]
+      else
+        console.error "Unacceptable non-string value '#{originA}' was " \
+          + "passed for origina A."
+        return false
+    else
+      originA = ['https://ukde.physicsfront.com/',
+        'https://ukde-stg.physicsfront.com/',
+        'https://ukde-dev.physicsfront.com/']
+      update_originA = true
+    reqkey = (new Date).getTime() + '--' + \
+      Math.round(1000000000000000 * Math.random())
+    gotit = false
+    call_UKDE = (originA_candidate, retry) =>
+      if retry
+        error_callback = ((jqXHR) ->
+          if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
+            setTimeout (-> not gotit and call_UKDE (originA_candidate)), 1000)
+      else
+        error_callback = undefined
+      $.ajax
+        type: "POST"
+        url: originA_candidate + "jwt-cfm"
+        dataType: 'json'
+        data:
+          secret: reqkey
+        success: (data) =>
+          if not gotit and data.JWTCFM
+            _JWTUCFM = data.JWTCFM
+            if update_originA
+              @_originA = originA_candidate
+            gotit = true
+        error: error_callback
+    for url in originA
+      if gotit
+        break
+      if url.indexOf "https://"
+        console.warn "originA url must start with https://; skipping '#{url}'."
+        continue
+      window.top.postMessage "heads-up--" + reqkey, url
+      setTimeout (-> call_UKDE url, true), 500
+    # just a bit paranoid here, but be mindful of security; make sure that
+    # the return value is not leaking any sensitive data
+    return !!gotit
+
   authorized: (authCallback) ->
-    # TODO: check UKDE token
-    authCallback true
+    authCallback !!_JWTUCFM
 
   save: (content, metadata, callback) ->
     try
