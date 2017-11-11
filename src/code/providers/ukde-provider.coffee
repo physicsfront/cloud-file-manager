@@ -44,9 +44,9 @@ class UkdeProvider extends ProviderInterface
   # @_originA.  If originA is already known, then call this method with that
   # as argument.
   #
-  # This method does not do anything on failure.  On success, it will set
-  # _JWTUCFM and, if no argument was given, @_originA.  So, these variables
-  # will persist over any failed attempt to call this method.
+  # This method does nothing on failure.  On success, it will set _JWTUCFM
+  # and, if no argument was given, @_originA.  So, these variables will
+  # persist over any failed attempts to get JWTUCFM by calling this method
   _getJWTUCFM: (originA) ->
     update_originA = false
     if originA
@@ -54,7 +54,7 @@ class UkdeProvider extends ProviderInterface
         originA = [originA]
       else
         console.error "Unacceptable non-string value '#{originA}' was " \
-          + "passed for origina A."
+          + "passed for originA."
         return false
     else
       originA = ['https://ukde.physicsfront.com/',
@@ -90,7 +90,7 @@ class UkdeProvider extends ProviderInterface
       if url.indexOf "https://"
         console.warn "originA url must start with https://; skipping '#{url}'."
         continue
-      window.top.postMessage "heads-up--" + reqkey, url
+      window.top.postMessage "ucfmr-heads-up--" + reqkey, url
       setTimeout (-> call_UKDE url, true), 500
     # just a bit paranoid here, but be mindful of security; make sure that
     # the return value is not leaking any sensitive data
