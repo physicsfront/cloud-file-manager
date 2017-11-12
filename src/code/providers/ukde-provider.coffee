@@ -40,6 +40,7 @@ class UkdeProvider extends ProviderInterface
         'https://ukde-stg.physicsfront.com/',
         'https://ukde-dev.physicsfront.com/']
 
+  # UCFM_PROTOCOL: _JWTUCFM is masked key, still needing to be protected.
   # Hidden in closure; should not be leaked outside this script.
   _JWTUCFM = undefined
 
@@ -84,6 +85,7 @@ class UkdeProvider extends ProviderInterface
         data:
           secret: reqkey
         success: (data) =>
+          # UCFM_PROTOCOL
           if not gotit and data.JWTCFM
             _JWTUCFM = data.JWTCFM
             if update_originA
