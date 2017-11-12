@@ -35,6 +35,10 @@ class UkdeProvider extends ProviderInterface
 
   @Name: 'ukde'
   @_defaultContent: 'This is the default text.'
+  # UCFM_PROTOCOL
+  @_originA_all: ['https://ukde.physicsfront.com/',
+        'https://ukde-stg.physicsfront.com/',
+        'https://ukde-dev.physicsfront.com/']
 
   # Hidden in closure; should not be leaked outside this script.
   _JWTUCFM = undefined
@@ -48,19 +52,21 @@ class UkdeProvider extends ProviderInterface
   # and, if no argument was given, @_originA.  So, these variables will
   # persist over any failed attempts to get JWTUCFM by calling this method
   _getJWTUCFM: (originA) ->
-    update_originA = false
+    update_originA = true
     if originA
       if isString originA
-        originA = [originA]
+        if originA not in UkdeProvider._originA_all
+          console.error "Illegal value '#{originA}' was passed for originA."
+          return false
+        originA_cands = [originA]
+        update_originA = false
       else
-        console.error "Unacceptable non-string value '#{originA}' was " \
+        console.error "Illegal type (non-string) value '#{originA}' was " \
           + "passed for originA."
         return false
     else
-      originA = ['https://ukde.physicsfront.com/',
-        'https://ukde-stg.physicsfront.com/',
-        'https://ukde-dev.physicsfront.com/']
-      update_originA = true
+      originA_cands = UkdeProvider._originA_all
+    # UCFM_PROTOCOL: reqkey
     reqkey = (new Date).getTime() + '--' + \
       Math.round(1000000000000000 * Math.random())
     gotit = false
@@ -84,12 +90,13 @@ class UkdeProvider extends ProviderInterface
               @_originA = originA_candidate
             gotit = true
         error: error_callback
-    for url in originA
+    for url in originA_cands
       if gotit
         break
       if url.indexOf "https://"
         console.warn "originA url must start with https://; skipping '#{url}'."
         continue
+      # UCFM_PROTOCOL: reqkey
       window.top.postMessage "ucfmr-heads-up--" + reqkey, url
       setTimeout (-> call_UKDE url, true), 500
     # just a bit paranoid here, but be mindful of security; make sure that
