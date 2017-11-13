@@ -65,7 +65,7 @@ class UkdeProvider extends ProviderInterface
           + "successfully from UKDE."
       error: (jqXHR) ->
         console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
-          jqXHR.responseJSON
+          JSON.stringify jqXHR.responseJSON
       async: async
 
   _getDefaultContent: (async=true) ->
@@ -80,7 +80,8 @@ class UkdeProvider extends ProviderInterface
         consol.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
       error: (jqXHR) ->
-        console.warn "_getDefaultContent ajax error!?: " + jqXHR.responseJSON
+        console.warn "_getDefaultContent ajax error!?: " + JSON.stringify \
+          jqXHR.responseJSON
       async: async
 
   ##
@@ -115,13 +116,15 @@ class UkdeProvider extends ProviderInterface
     call_UKDE = (originA_candidate, retry=false) =>
       if retry
         error_callback = (jqXHR) ->
-          console.warn "_getJWTUCFM ajax error!?: " + jqXHR.responseJSON
+          console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
+            jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
             setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
       else
         error_callback = (jqXHR) ->
-          console.warn "_getJWTUCFM ajax error!?: " + jqXHR.responseJSON
+          console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
+            jqXHR.responseJSON
       $.ajax
         type: "POST"
         url: originA_candidate + "cfm/jwt"
@@ -175,7 +178,8 @@ class UkdeProvider extends ProviderInterface
         error: (jqXHR) =>
           if retry and jqXHR.responseJSON?.error is 'Your JWTUCFM expired.'
             @_renew_JWT_and_save content, metadata, callback
-          console.warn "save ajax error!?: " + jqXHR.responseJSON
+          console.warn "save ajax error!?: " + JSON.stringify \
+            jqXHR.responseJSON
       # console.log "== save: #{@_lastSavedContent}"
       callback? null
     catch e
