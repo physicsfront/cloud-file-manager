@@ -58,8 +58,7 @@ class UkdeProvider extends ProviderInterface
       url: @_originA + "cfm/doc"
       dataType: 'json'
       contentType: 'application/json'
-      data:
-        filetype: @ukdeFileType
+      data: {filetype: @ukdeFileType}
       success: (data) =>
         @_lastSavedContent = data
         consol.log "File of type '#{@ukdeFileType}' was retrieved " \
@@ -75,8 +74,7 @@ class UkdeProvider extends ProviderInterface
       url: @_originA + "cfm/default-doc"
       dataType: 'json'
       contentType: 'application/json'
-      data:
-        filetype: @ukdeFileType
+      data: {filetype: @ukdeFileType}
       success: (data) =>
         @DefaultContent = data
         consol.log "Default content of type '#{@ukdeFileType}' was " \
@@ -132,8 +130,7 @@ class UkdeProvider extends ProviderInterface
         url: originA_candidate + "cfm/jwt"
         dataType: 'json'
         contentType: 'application/json'
-        data:
-          secret: reqkey
+        data: {secret: reqkey}
         success: (data) =>
           if not gotit and data.JWTUCFM
             # UCFM_PROTOCOL: JWTUCFM
