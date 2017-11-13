@@ -57,6 +57,7 @@ class UkdeProvider extends ProviderInterface
       type: "GET"
       url: @_originA + "cfm/doc"
       dataType: 'json'
+      contentType: 'application/json'
       data:
         filetype: @ukdeFileType
       success: (data) =>
@@ -73,6 +74,7 @@ class UkdeProvider extends ProviderInterface
       type: "GET"
       url: @_originA + "cfm/default-doc"
       dataType: 'json'
+      contentType: 'application/json'
       data:
         filetype: @ukdeFileType
       success: (data) =>
@@ -129,6 +131,7 @@ class UkdeProvider extends ProviderInterface
         type: "POST"
         url: originA_candidate + "cfm/jwt"
         dataType: 'json'
+        contentType: 'application/json'
         data:
           secret: reqkey
         success: (data) =>
@@ -169,6 +172,7 @@ class UkdeProvider extends ProviderInterface
         type: "POST"
         url: @_originA + "cfm/doc"
         dataType: 'json'
+        contentType: 'application/json'
         data:
           filetype: @ukdeFileType
           DOCUCFM: unwrapped_content
