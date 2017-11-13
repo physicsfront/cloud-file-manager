@@ -34,7 +34,7 @@
       const _defaultContent = (function () {
         var ans = ""
         function get_default_content () {
-          if (ans) return ans // singleton
+          if (ans) return ans // singleton (if true value)
           if (! cfmClient) return ""
           var new_ans = cfmClient.providers [ukdeProviderName].DefaultContent
           if (! new_ans) return ""
@@ -49,7 +49,7 @@
         document.getElementById ('save_btn').disabled =
           (content === cfmContent)
         document.getElementById ('open_btn').disabled =
-          (cfmContentLastSaved === content)
+          (content === cfmContentLastSaved)
         _setOpenDefaultBtnState (content)
       }
 
@@ -88,11 +88,7 @@
       function saveFile () {
         if (! cfmClient) return
         cfmClient.saveFileNoDialog (getContent (), cfmClient.state.metadata)
-        // TODO: check whether the content was really saved.
-        cfmContent = getContent ()
-        cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
-          ._lastSavedContent
-        _checkContentChange (cfmContent)
+        // If successful, then we will receive "savedFile" event (see below).
       }
 
       function setContent (_cfmContent) {
@@ -191,7 +187,7 @@
     <script type="text/javascript">
       var clientOptions = {
         mimeType: "text/plain",
-        appName: "CFM_Demo",
+        appName: "UCFM_Demo",
         appVersion: "0.1",
         appBuildNum: "1",
         providers: [
@@ -220,6 +216,11 @@
             focus ()
             if (event.callback) event.callback ()
             break
+         case 'savedFile':
+            cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
+               ._lastSavedContent
+            _checkContentChange ()
+            break
         }
       })
       document.getElementById ("ukde_file_type").innerHTML = '' + ukdeFileType
@@ -234,7 +235,8 @@
         for (const event_name of ["input", "keyup", "paste"])
           w.addEventListener (event_name, checkCC)
       })("text")
-      // file should be opened automatically; metadata will be  non-null.
+      // file should be opened automatically; metadata must be set to a valid
+      // value in order for UCFM and this page to function properly.
       openFile ()
     </script>
     <!-- >>> -->
