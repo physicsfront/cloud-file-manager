@@ -130,7 +130,7 @@ class UkdeProvider extends ProviderInterface
         url: originA_candidate + "cfm/jwt"
         dataType: 'json'
         contentType: 'application/json'
-        data: {secret: reqkey}
+        data: JSON.stringify {secret: reqkey}
         success: (data) =>
           if not gotit and data.JWTUCFM
             # UCFM_PROTOCOL: JWTUCFM
