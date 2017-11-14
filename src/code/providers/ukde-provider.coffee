@@ -18,7 +18,7 @@ class UkdeProvider extends ProviderInterface
     _getJWTUCFM null, (=>
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 20)
+      setTimeout (=> @_check_UKDE_connection()), 50)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -38,7 +38,7 @@ class UkdeProvider extends ProviderInterface
   _init_UKDE_data_connections = 2
 
   _check_UKDE_connection: ->
-    console.log "_check_UKDE_connection: called"
+    console.log "_check_UKDE_connection: called---will check!"
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
       a_.push "Failed to connect to UKDE---trouble ahead..."
@@ -46,17 +46,15 @@ class UkdeProvider extends ProviderInterface
       a_.push "Failed to get default content from UKDE---trouble ahead..."
     if @LastSavedContent is undefined
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
-    console.log a_.length
     if not a_.length
-      console.log "All is well with UKDE connection---nice!"
+      console.log "_check_UKDE_connection: all is well---nice!"
       return
     if _getJWTUCFM_running or _init_UKDE_data_connections
-      console.log "" + _getJWTUCFM_running + ", " + _init_UKDE_data_connections
-      setTimeout (=> @_check_UKDE_connection()), 1000
-      console.log "called: " + typeof @_check_UKDE_connection
+      setTimeout (=> @_check_UKDE_connection()), 300
+      console.log "_check_UKDE_connection: will be called again..."
     else
-      console.log "@DefaultContent = " + @DefaultContent
-      console.log "@LastSavedContent = " + @LastSavedContent
+      console.log "_check_UKDE_connection: not all is well... reporting " \
+        "problem(s)..."
       errstr = a_.join "\n"
       console.error errstr
       alert errstr
