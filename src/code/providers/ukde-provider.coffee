@@ -17,24 +17,22 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     # These calls are made synchronously, since it is important to initialize
     # key variables.
-    @_getJWTUCFM(null, (=>
-      @_getDefaultContent false
-      @_get_lastSavedContent_from_UKDE false
-      if _JWTUCFM is undefined or @_originA is undefined
-        alert "Failed to connect to UKDE---trouble ahead..."
-      else if @DefaultContent is undefined
-        alert "Failed to get default content from UKDE---trouble ahead..."
-      else if @_lastSavedContent is undefined
-        alert "Failed to get last saved document from UKDE---trouble ahead..."
-      ), false)
+    @_getJWTUCFM null, (=>
+        @_getDefaultContent false
+        @_get_lastSavedContent_from_UKDE false
+        if _JWTUCFM is undefined or @_originA is undefined
+          alert "Failed to connect to UKDE---trouble ahead..."
+        else if @DefaultContent is undefined
+          alert "Failed to get default content from UKDE---trouble ahead..."
+        else if @_lastSavedContent is undefined
+          alert "Failed to get last saved doc. from UKDE---trouble ahead..."
+      ), false
     # For some reasons unknown to me, this constructor code gets executed 3
     # times, and the first 2 times do NOT invoke @_getJWTUCFM, while some
     # other parts of this constructor get executed.  For instance, if I put
-    # the above "alert" codes here, then the first alert always happens!  So,
-    # this console.log line will be executed 3 times, while the console.log
-    # line in @_getJWTUCFM will be executed only 1 time.  I would hazard a
-    # guess that this constructor is executed during a prototype building
-    # process or something like it.
+    # the above "alert" codes here, then the first alert always happens!
+    # Strange...  I'd hazard a guess that this constructor is executed during
+    # a prototype building process or something like it.
     console.log 'Hey, I am here (inside "UkdeProvider.constructor")!'
     super
       name: UkdeProvider.Name
