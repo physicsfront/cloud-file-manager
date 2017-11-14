@@ -18,14 +18,14 @@ class UkdeProvider extends ProviderInterface
     # These calls are made synchronously, since it is important to initialize
     # key variables.
     @_getJWTUCFM null, (=>
-        @_getDefaultContent false
-        @_get_lastSavedContent_from_UKDE false
-        if _JWTUCFM is undefined or @_originA is undefined
-          alert "Failed to connect to UKDE---trouble ahead..."
-        else if @DefaultContent is undefined
-          alert "Failed to get default content from UKDE---trouble ahead..."
-        else if @_lastSavedContent is undefined
-          alert "Failed to get last saved doc. from UKDE---trouble ahead..."
+      @_getDefaultContent false
+      @_get_lastSavedContent_from_UKDE false
+      if _JWTUCFM is undefined or @_originA is undefined
+        alert "Failed to connect to UKDE---trouble ahead..."
+      else if @DefaultContent is undefined
+        alert "Failed to get default content from UKDE---trouble ahead..."
+      else if @_lastSavedContent is undefined
+        alert "Failed to get last saved doc. from UKDE---trouble ahead..."
       ), false
     # For some reasons unknown to me, this constructor code gets executed 3
     # times, and the first 2 times do NOT invoke @_getJWTUCFM, while some
