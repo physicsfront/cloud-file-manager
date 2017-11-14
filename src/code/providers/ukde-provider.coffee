@@ -28,7 +28,7 @@ class UkdeProvider extends ProviderInterface
         remove: false
         rename: false
         close: true
-    _getJWTUCFM null, (=>
+    @_getJWTUCFM null, (=>
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
       setTimeout @_check_UKDE_connection, 2000)
@@ -212,7 +212,7 @@ class UkdeProvider extends ProviderInterface
       n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback, retry=false) ->
-    _getJWTUCFM _originA, (=> @save content, metadata, callback, retry)
+    @_getJWTUCFM _originA, (=> @save content, metadata, callback, retry)
 
   authorized: (authCallback) ->
     authCallback !!_JWTUCFM
