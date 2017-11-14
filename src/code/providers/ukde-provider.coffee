@@ -20,6 +20,13 @@ class UkdeProvider extends ProviderInterface
     @_getJWTUCFM null, (=>
       @_getDefaultContent false
       @_get_lastSavedContent_from_UKDE false), false
+    if _JWTUCFM is undefined or @_originA is undefined
+      console.warn "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
+      alert "Failed to connect to UKDE---trouble ahead..."
+    else if @DefaultContent is undefined
+      alert "Failed to get default content from UKDE---trouble ahead..."
+    else if @_lastSavedContent is undefined
+      alert "Failed to get last saved document from UKDE---trouble ahead..."
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -33,12 +40,6 @@ class UkdeProvider extends ProviderInterface
         remove: false
         rename: false
         close: true
-    if _JWTUCFM is undefined or @_originA is undefined
-      alert "Failed to connect to UKDE---trouble ahead..."
-    else if @DefaultContent is undefined
-      alert "Failed to get default content from UKDE---trouble ahead..."
-    else if @_lastSavedContent is undefined
-      alert "Failed to get last saved document from UKDE---trouble ahead..."
 
   @Name: 'ukde'
   @_defaultContent: {message: '... UKDE is being contacted---please wait ...'}
@@ -138,6 +139,7 @@ class UkdeProvider extends ProviderInterface
             # UCFM_PROTOCOL: JWTUCFM
             _JWTUCFM = data.JWTUCFM
             if update_originA
+              console.log "Setting _originA as '#{originA_candidate}'---good!"
               @_originA = originA_candidate
             gotit = true
             callback?()
