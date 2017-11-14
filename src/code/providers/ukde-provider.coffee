@@ -37,6 +37,9 @@ class UkdeProvider extends ProviderInterface
 
   _init_UKDE_data_connections = 0
 
+  _check_UKDE_connection_again: ->
+    @_check_UKDE_connection()
+
   _check_UKDE_connection: ->
     console.log "_check_UKDE_connection: called"
     a_ = []
@@ -60,9 +63,6 @@ class UkdeProvider extends ProviderInterface
       errstr = a_.join "\n"
       console.error errstr
       alert errstr
-
-  _check_UKDE_connection_again: ->
-    @_check_UKDE_connection()
 
   # UCFM_PROTOCOL: values and formats of possible originA values
   _originA_pool = ['https://ukde.physicsfront.com/',
