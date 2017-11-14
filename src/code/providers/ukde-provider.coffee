@@ -19,15 +19,14 @@ class UkdeProvider extends ProviderInterface
     # key variables.
     @_getJWTUCFM(null, (=>
       @_getDefaultContent false
-      @_get_lastSavedContent_from_UKDE false), false)
-    console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
-    if _JWTUCFM is undefined or @_originA is undefined
-      console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
-      alert "Failed to connect to UKDE---trouble ahead..."
-    else if @DefaultContent is undefined
-      alert "Failed to get default content from UKDE---trouble ahead..."
-    else if @_lastSavedContent is undefined
-      alert "Failed to get last saved document from UKDE---trouble ahead..."
+      @_get_lastSavedContent_from_UKDE false
+      if _JWTUCFM is undefined or @_originA is undefined
+        alert "Failed to connect to UKDE---trouble ahead..."
+      else if @DefaultContent is undefined
+        alert "Failed to get default content from UKDE---trouble ahead..."
+      else if @_lastSavedContent is undefined
+        alert "Failed to get last saved document from UKDE---trouble ahead..."
+      ), false)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
