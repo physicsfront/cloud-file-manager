@@ -39,6 +39,7 @@ class UkdeProvider extends ProviderInterface
   _init_UKDE_data_connections = 0
 
   _check_UKDE_connection: ->
+    console.log "_check_UKDE_connection: called"
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
       a_.push "Failed to connect to UKDE---trouble ahead..."
