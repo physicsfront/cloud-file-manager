@@ -54,7 +54,7 @@ class UkdeProvider extends ProviderInterface
       console.log "_check_UKDE_connection: will be called again..."
     else
       console.log "_check_UKDE_connection: not all is well... reporting " \
-        "problem(s)..."
+        + "problem(s)..."
       errstr = a_.join "\n"
       console.error errstr
       alert errstr
