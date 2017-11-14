@@ -219,7 +219,7 @@ class UkdeProvider extends ProviderInterface
       url_OK = true
       try
         # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-        if _blocked_console_err_cg (-> window.top.postMessage
+        if _blocked_console_err_cg (-> window.top.postMessage \
             "ucfmr-heads-up--" + reqkey, url)
           url_OK = false
       catch e
