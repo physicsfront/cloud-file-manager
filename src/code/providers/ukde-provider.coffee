@@ -18,7 +18,7 @@ class UkdeProvider extends ProviderInterface
     _getJWTUCFM null, (=>
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 50)
+      setTimeout (=> @_check_UKDE_connection()), 100)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -35,9 +35,24 @@ class UkdeProvider extends ProviderInterface
 
   @Name: 'ukde'
 
+  ##
+  # Utility function that provides a context guard for temporarilry blocking
+  # console.error.
+  _blocked_console_err_cg = (f) ->
+    n_errors = 0
+    console_error = console.error
+    try
+      console.error = (msg) -> n_errors++
+      f()
+    finally
+      console.error = console_error
+    n_errors
+
   _init_UKDE_data_connections = 2
+  _n_check_UKDE = 0
 
   _check_UKDE_connection: ->
+    _n_check_UKDE++
     console.log "_check_UKDE_connection: called---will check!"
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
@@ -49,15 +64,16 @@ class UkdeProvider extends ProviderInterface
     if not a_.length
       console.log "_check_UKDE_connection: all is well---nice!"
       return
-    if _getJWTUCFM_running or _init_UKDE_data_connections
-      setTimeout (=> @_check_UKDE_connection()), 300
-      console.log "_check_UKDE_connection: will be called again..."
-    else
-      console.log "_check_UKDE_connection: not all is well... reporting " \
-        + "problem(s)..."
-      errstr = a_.join "\n"
-      console.error errstr
-      alert errstr
+    if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
+      if _n_check_UKDE <= 25 # so, it is a total 5 sec. wait plus init wait
+        setTimeout (=> @_check_UKDE_connection()), 200
+        console.log "_check_UKDE_connection: will be called again..."
+        return
+    console.log "_check_UKDE_connection: not all is well... reporting " \
+      + "problem(s)..."
+    errstr = a_.join "\n"
+    console.error errstr
+    alert errstr
 
   # UCFM_PROTOCOL: values and formats of possible originA values
   _originA_pool = ['https://ukde.physicsfront.com/',
@@ -68,7 +84,7 @@ class UkdeProvider extends ProviderInterface
   # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
   # Hidden in closure; should not be leaked outside this script.
   _JWTUCFM = undefined
-  _getJWTUCFM_running = false
+  _getJWTUCFM_running_maybe = false
 
   _getLastSavedContent_from_UKDE: ->
     if not _originA
@@ -132,7 +148,7 @@ class UkdeProvider extends ProviderInterface
   #
   # In addition, callback will be invoked (with no arguments) on success.
   _getJWTUCFM = (originA, callback) ->
-    _getJWTUCFM_running = true
+    _getJWTUCFM_running_maybe = true
     n_UKDE_calls = 0
     update_originA = true
     if originA
@@ -165,14 +181,14 @@ class UkdeProvider extends ProviderInterface
           else
             n_UKDE_calls -= 1
             if n_UKDE_calls is 0
-              _getJWTUCFM_running = false
+              _getJWTUCFM_running_maybe = false
       else
         error_callback = (jqXHR) ->
           if gotit
             return
           n_UKDE_calls -= 1
           if n_UKDE_calls is 0
-            _getJWTUCFM_running = false
+            _getJWTUCFM_running_maybe = false
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
       $.ajax
@@ -189,10 +205,10 @@ class UkdeProvider extends ProviderInterface
               _originA = originA_candidate
             callback?()
             gotit = true
-            _getJWTUCFM_running = false
+            _getJWTUCFM_running_maybe = false
           n_UKDE_calls -= 1
           if n_UKDE_calls is 0
-            _getJWTUCFM_running = false
+            _getJWTUCFM_running_maybe = false
         error: error_callback
     for url in originA_cands
       if gotit
@@ -200,11 +216,21 @@ class UkdeProvider extends ProviderInterface
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
-      # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-      window.top.postMessage "ucfmr-heads-up--" + reqkey, url
-      # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
-      setTimeout (-> call_UKDE url, true), 500
-      n_UKDE_calls += 1
+      url_OK = true
+      try
+        # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
+        if _blocked_console_err_cg (-> window.top.postMessage
+            "ucfmr-heads-up--" + reqkey, url)
+          url_OK = false
+      catch e
+        url_OK = false
+      if url_OK
+        # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
+        setTimeout (-> call_UKDE url, true), 500
+        # Once we find the URL for window.top, then there is no need to try
+        # any other URL.
+        break
+        n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback) ->
     _getJWTUCFM _originA, (=> @save content, metadata, callback, false)
