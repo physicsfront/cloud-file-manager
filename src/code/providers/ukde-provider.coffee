@@ -15,7 +15,7 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
-    @_getJWTUCFM null, (=>
+    _getJWTUCFM null, (=>
       _init_UKDE_data_connections = 2
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
@@ -210,7 +210,7 @@ class UkdeProvider extends ProviderInterface
       n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback) ->
-    @_getJWTUCFM _originA, (=> @save content, metadata, callback, false)
+    _getJWTUCFM _originA, (=> @save content, metadata, callback, false)
 
   authorized: (authCallback) ->
     authCallback !!_JWTUCFM
