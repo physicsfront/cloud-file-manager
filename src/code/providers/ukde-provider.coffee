@@ -15,10 +15,6 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
-    _getJWTUCFM null, (=>
-      @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE()
-      setTimeout @_check_UKDE_connection, 2000)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -32,6 +28,10 @@ class UkdeProvider extends ProviderInterface
         remove: false
         rename: false
         close: true
+    _getJWTUCFM null, (=>
+      @_getDefaultContent()
+      @_getLastSavedContent_from_UKDE()
+      setTimeout @_check_UKDE_connection, 2000)
 
   @Name: 'ukde'
 
