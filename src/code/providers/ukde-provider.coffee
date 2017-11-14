@@ -32,7 +32,7 @@ class UkdeProvider extends ProviderInterface
       _init_UKDE_data_connections = 2
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 200)
+      setTimeout (=> @_check_UKDE_connection()), 20)
 
   @Name: 'ukde'
 
