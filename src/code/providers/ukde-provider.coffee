@@ -27,10 +27,15 @@ class UkdeProvider extends ProviderInterface
       else if @_lastSavedContent is undefined
         alert "Failed to get last saved document from UKDE---trouble ahead..."
       ), false)
-    # For some reason unknown to me, this constructor code gets executed 3
+    # For some reasons unknown to me, this constructor code gets executed 3
     # times, and the first 2 times do NOT invoke @_getJWTUCFM, while some
     # other parts of this constructor get executed.  For instance, if I put
-    # the above "alert" codes here, then the first alert always happens!
+    # the above "alert" codes here, then the first alert always happens!  So,
+    # this console.log line will be executed 3 times, while the console.log
+    # line in @_getJWTUCFM will be executed only 1 time.  I would hazard a
+    # guess that this constructor is executed during a prototype building
+    # process or something like it.
+    console.log 'Hey, I am here (inside "UkdeProvider.constructor")!'
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
