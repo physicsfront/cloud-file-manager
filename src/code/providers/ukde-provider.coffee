@@ -50,6 +50,7 @@ class UkdeProvider extends ProviderInterface
       console.log "All is well with UKDE connection---nice!"
       return
     if _getJWTUCFM_running or _init_UKDE_data_connections
+      console.log "" + _getJWTUCFM_running + ", " + _init_UKDE_data_connections
       setTimeout @_check_UKDE_connection, 1000
     else
       console.log "@DefaultContent = " + @DefaultContent
