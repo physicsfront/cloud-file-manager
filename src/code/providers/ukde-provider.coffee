@@ -14,6 +14,19 @@ class UkdeProvider extends ProviderInterface
           + "was passed."
         alert msg
         throw Error msg
+    if "originA" of @options
+      if isString @options.originA
+        _originA_cands=[ _originA_pool[@options.originA] ]
+      else
+        _originA_cands=(_originA_pool[k_] for k_ in @options.originA)
+      for val in _originA_cands
+        if not val
+          throw Error "Error in options.originA---it must be a string " + \
+            "('pro','stg', or 'dev') or an array of these strings."
+      if _originA_cands.length > _originA_pool.length * 2
+        throw Error "Too many elements passed to options.originA."
+    else
+      _originA_cands=(v_ for own k_, v_ of _originA_pool)
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
@@ -34,19 +47,6 @@ class UkdeProvider extends ProviderInterface
         close: true
 
   @Name: 'ukde'
-
-  ##
-  # Utility function that provides a context guard for temporarilry blocking
-  # console.error.
-  _blocked_console_err_cg = (f) ->
-    n_errors = 0
-    console_error = console.error
-    try
-      console.error = (msg) -> n_errors++
-      f()
-    finally
-      console.error = console_error
-    n_errors
 
   _init_UKDE_data_connections = 2
   _n_check_UKDE = 0
@@ -76,9 +76,11 @@ class UkdeProvider extends ProviderInterface
     alert errstr
 
   # UCFM_PROTOCOL: values and formats of possible originA values
-  _originA_pool = ['https://ukde.physicsfront.com/',
-                   'https://ukde-stg.physicsfront.com/',
-                   'https://ukde-dev.physicsfront.com/']
+  _originA_pool =
+    pro: 'https://ukde.physicsfront.com/'
+    stg: 'https://ukde-stg.physicsfront.com/'
+    dev: 'https://ukde-dev.physicsfront.com/'
+  _originA_cands = []
   _originA = undefined
 
   # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
@@ -135,11 +137,11 @@ class UkdeProvider extends ProviderInterface
   # all subsequent operations.
   #
   # In the process, this private function goes over all possible UKDE base
-  # URLS (_originA_pool).  The first URL that responds successfully will be
-  # remembered as _originA.
+  # URLS (_originA_cands or _originA_pool).  The first URL that responds
+  # successfully will be remembered as _originA.
   #
   # If originA is already known, then call this method with that value as the
-  # first argument.  That value must be one of _originA_pool.
+  # first argument.  That value must be one of the values of _originA_cands.
   #
   # On success, this function will set _JWTUCFM and, if originA was a false
   # value, _originA.  So, these variables will persist over any failed calls
@@ -153,7 +155,7 @@ class UkdeProvider extends ProviderInterface
     update_originA = true
     if originA
       if isString originA
-        if originA not in _originA_pool
+        if originA not in _originA_cands
           console.error "Illegal value '#{originA}' was passed for originA."
           return
         originA_cands = [originA]
@@ -163,7 +165,7 @@ class UkdeProvider extends ProviderInterface
           + "passed for originA."
         return
     else
-      originA_cands = _originA_pool
+      originA_cands = _originA_cands
     # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
     reqkey = (new Date).getTime() + '--' + \
       Math.round 1000000000000000 * Math.random()
@@ -177,7 +179,8 @@ class UkdeProvider extends ProviderInterface
             jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
-            setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
+            setTimeout ((this_can) -> not gotit and call_UKDE this_can), \
+              1000, originA_candidate
           else
             n_UKDE_calls -= 1
             if n_UKDE_calls is 0
@@ -217,20 +220,9 @@ class UkdeProvider extends ProviderInterface
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
       # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-      console.log window.top.postMessage "ucfmr-heads-up--" + reqkey, url
-      #url_OK = true
-      #try
-      #  if _blocked_console_err_cg (-> window.top.postMessage \
-      #      "ucfmr-heads-up--" + reqkey, url)
-      #    url_OK = false
-      #catch e
-      #  url_OK = false
-      #if url_OK
+      window.top.postMessage "ucfmr-heads-up--" + reqkey, url
       # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
-      setTimeout (-> call_UKDE url, true), 500
-      # Once we find the URL for window.top, then there is no need to try
-      # any other URL.
-      #break
+      setTimeout ((this_url) -> call_UKDE this_url, true), 500, url
       n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback) ->
