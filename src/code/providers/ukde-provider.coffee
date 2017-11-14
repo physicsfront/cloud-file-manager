@@ -64,7 +64,7 @@ class UkdeProvider extends ProviderInterface
       dataType: 'json'
       success: (data) =>
         @_lastSavedContent = data
-        consol.log "File of type '#{@ukdeFileType}' was retrieved " \
+        console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
         console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
@@ -82,7 +82,7 @@ class UkdeProvider extends ProviderInterface
       dataType: 'json'
       success: (data) =>
         @DefaultContent = data
-        consol.log "Default content of type '#{@ukdeFileType}' was " \
+        console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
       error: (jqXHR) ->
         console.warn "_getDefaultContent ajax error!?: " + JSON.stringify \
@@ -181,7 +181,7 @@ class UkdeProvider extends ProviderInterface
           DOCUCFM: unwrapped_content
         success: (data) =>
           @_lastSavedContent = unwrapped_content
-          consol.log "File was saved successfully. Return data='#{data}'."
+          console.log "File was saved successfully. Return data='#{data}'."
         error: (jqXHR) =>
           if retry and jqXHR.responseJSON?.error is 'Your JWTUCFM expired.'
             @_renew_JWT_and_save content, metadata, callback
