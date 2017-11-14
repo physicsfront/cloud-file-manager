@@ -17,8 +17,8 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE())
-    setTimeout @_check_UKDE_connection, 2000
+      @_getLastSavedContent_from_UKDE()
+      setTimeout @_check_UKDE_connection, 2000)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
