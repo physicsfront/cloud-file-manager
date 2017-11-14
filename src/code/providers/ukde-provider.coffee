@@ -15,11 +15,13 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
-    # These calls are made synchronously, since it is important to initialize
-    # key variables.
+    # These calls are made synchronously, as it is important to initialize
+    # key variables.  jquery may complain via a warning message!
     @_getJWTUCFM null, (=>
       @_getDefaultContent false
       @_get_lastSavedContent_from_UKDE false
+      # WARNING: strange behavior was observed when this if block (6 lines)
+      # is placed at the top scope of the constructor.
       if _JWTUCFM is undefined or @_originA is undefined
         alert "Failed to connect to UKDE---trouble ahead..."
       else if @DefaultContent is undefined
@@ -27,13 +29,6 @@ class UkdeProvider extends ProviderInterface
       else if @_lastSavedContent is undefined
         alert "Failed to get last saved doc. from UKDE---trouble ahead..."
       ), false
-    # For some reasons unknown to me, this constructor code gets executed 3
-    # times, and the first 2 times do NOT invoke @_getJWTUCFM, while some
-    # other parts of this constructor get executed.  For instance, if I put
-    # the above "alert" codes here, then the first alert always happens!
-    # Strange...  I'd hazard a guess that this constructor is executed during
-    # a prototype building process or something like it.
-    console.log 'Hey, I am here (inside "UkdeProvider.constructor")!'
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -63,11 +58,10 @@ class UkdeProvider extends ProviderInterface
   _get_lastSavedContent_from_UKDE: (async=true) ->
     $.ajax
       type: "GET"
-      processData: false
-      data: JSON.stringify filetype: @ukdeFileType
+      data:
+        filetype: @ukdeFileType
       url: @_originA + "cfm/doc"
       dataType: 'json'
-      contentType: 'application/json'
       success: (data) =>
         @_lastSavedContent = data
         consol.log "File of type '#{@ukdeFileType}' was retrieved " \
@@ -80,11 +74,10 @@ class UkdeProvider extends ProviderInterface
   _getDefaultContent: (async=true) ->
     $.ajax
       type: "GET"
-      processData: false
-      data: JSON.stringify filetype: @ukdeFileType
+      data:
+        filetype: @ukdeFileType
       url: @_originA + "cfm/default-doc"
       dataType: 'json'
-      contentType: 'application/json'
       success: (data) =>
         @DefaultContent = data
         consol.log "Default content of type '#{@ukdeFileType}' was " \
