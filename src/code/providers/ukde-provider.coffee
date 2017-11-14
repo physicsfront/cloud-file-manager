@@ -70,6 +70,8 @@ class UkdeProvider extends ProviderInterface
         console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
           JSON.stringify jqXHR.responseJSON
       async: async
+      beforeSend: (xhr) ->
+        xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
 
   _getDefaultContent: (async=true) ->
     $.ajax
