@@ -15,6 +15,11 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
+    @_getJWTUCFM null, (=>
+      _init_UKDE_data_connections = 2
+      @_getDefaultContent()
+      @_getLastSavedContent_from_UKDE()
+      setTimeout (=> @_check_UKDE_connection()), 20)
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -28,23 +33,13 @@ class UkdeProvider extends ProviderInterface
         remove: false
         rename: false
         close: true
-    @_getJWTUCFM null, (=>
-      _init_UKDE_data_connections = 2
-      @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 20)
 
   @Name: 'ukde'
 
   _init_UKDE_data_connections = 0
 
-  _check_UKDE_connection_again: ->
-    @_check_UKDE_connection()
-
   _check_UKDE_connection: ->
     console.log "_check_UKDE_connection: called"
-    console.log "function: " + @_check_UKDE_connection
-    console.log "function: " + @_check_UKDE_connection_again
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
       a_.push "Failed to connect to UKDE---trouble ahead..."
@@ -58,8 +53,8 @@ class UkdeProvider extends ProviderInterface
       return
     if _getJWTUCFM_running or _init_UKDE_data_connections
       console.log "" + _getJWTUCFM_running + ", " + _init_UKDE_data_connections
-      setTimeout (=> @_check_UKDE_connection_again()), 1000
-      console.log "called: " + @_check_UKDE_connection_again
+      setTimeout (=> @_check_UKDE_connection()), 1000
+      console.log "called: " + typeof @_check_UKDE_connection
     else
       console.log "@DefaultContent = " + @DefaultContent
       console.log "@LastSavedContent = " + @LastSavedContent
@@ -139,7 +134,7 @@ class UkdeProvider extends ProviderInterface
   # failure.
   #
   # In addition, callback will be invoked (with no arguments) on success.
-  _getJWTUCFM: (originA, callback) ->
+  _getJWTUCFM = (originA, callback) ->
     _getJWTUCFM_running = true
     n_UKDE_calls = 0
     update_originA = true
