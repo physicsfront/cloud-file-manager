@@ -17,10 +17,10 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     # These calls are made synchronously, since it is important to initialize
     # key variables.
-    @_getJWTUCFM null, (=>
-      console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
+    @_getJWTUCFM(null, (=>
       @_getDefaultContent false
-      @_get_lastSavedContent_from_UKDE false), false
+      @_get_lastSavedContent_from_UKDE false), false)
+    console.warn "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
     if _JWTUCFM is undefined or @_originA is undefined
       console.warn "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
       alert "Failed to connect to UKDE---trouble ahead..."
