@@ -216,21 +216,22 @@ class UkdeProvider extends ProviderInterface
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
-      url_OK = true
-      try
-        # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-        if _blocked_console_err_cg (-> window.top.postMessage \
-            "ucfmr-heads-up--" + reqkey, url)
-          url_OK = false
-      catch e
-        url_OK = false
-      if url_OK
-        # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
-        setTimeout (-> call_UKDE url, true), 500
-        # Once we find the URL for window.top, then there is no need to try
-        # any other URL.
-        break
-        n_UKDE_calls += 1
+      # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
+      console.log window.top.postMessage "ucfmr-heads-up--" + reqkey, url
+      #url_OK = true
+      #try
+      #  if _blocked_console_err_cg (-> window.top.postMessage \
+      #      "ucfmr-heads-up--" + reqkey, url)
+      #    url_OK = false
+      #catch e
+      #  url_OK = false
+      #if url_OK
+      # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
+      setTimeout (-> call_UKDE url, true), 500
+      # Once we find the URL for window.top, then there is no need to try
+      # any other URL.
+      #break
+      n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback) ->
     _getJWTUCFM _originA, (=> @save content, metadata, callback, false)
