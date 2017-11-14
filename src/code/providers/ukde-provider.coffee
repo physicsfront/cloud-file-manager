@@ -27,6 +27,10 @@ class UkdeProvider extends ProviderInterface
       else if @_lastSavedContent is undefined
         alert "Failed to get last saved document from UKDE---trouble ahead..."
       ), false)
+    # For some reason unknown to me, this constructor code gets executed 3
+    # times, and the first 2 times do NOT invoke @_getJWTUCFM, while some
+    # other parts of this constructor get executed.  For instance, if I put
+    # the above "alert" codes here, then the first alert always happens!
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -98,6 +102,7 @@ class UkdeProvider extends ProviderInterface
   #
   # This method does nothing on failure.
   _getJWTUCFM: (originA, callback, async=true) ->
+    console.log "_getJWTUCFM is being called!"
     update_originA = true
     if originA
       if isString originA
@@ -137,10 +142,8 @@ class UkdeProvider extends ProviderInterface
         success: (data) =>
           if not gotit and data.JWTUCFM
             # UCFM_PROTOCOL: JWTUCFM
-            console.log "Setting _JWTUCFM as '#{data.JWTUCFM}'---good!"
             _JWTUCFM = data.JWTUCFM
             if update_originA
-              console.log "Setting _originA as '#{originA_candidate}'---good!"
               @_originA = originA_candidate
             gotit = true
             callback?()
