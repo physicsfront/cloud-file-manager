@@ -44,10 +44,13 @@ class UkdeProvider extends ProviderInterface
     if @_lastSavedContent is undefined
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
     if a_.length is 0
+      console.log "All is well with UKDE connection---nice!"
       return
     if _getJWTUCFM_running
       setTimeout @_check_UKDE_connection 1000
     else
+      console.log "@DefaultContent = " + @DefaultContent
+      console.log "@_lastSavedContent = " + @_lastSavedContent
       errstr = a_.join "\n"
       console.error errstr
       alert errstr
