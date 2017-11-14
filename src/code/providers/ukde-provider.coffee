@@ -16,6 +16,7 @@ class UkdeProvider extends ProviderInterface
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
+      _init_UKDE_connections = 2
       @_getDefaultContent()
       @_get_lastSavedContent_from_UKDE())
     setTimeout @_check_UKDE_connection, 2000
@@ -35,6 +36,8 @@ class UkdeProvider extends ProviderInterface
 
   @Name: 'ukde'
 
+  _init_UKDE_data_connections = 0
+
   _check_UKDE_connection: ->
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
@@ -46,7 +49,7 @@ class UkdeProvider extends ProviderInterface
     if a_.length is 0
       console.log "All is well with UKDE connection---nice!"
       return
-    if _getJWTUCFM_running
+    if _getJWTUCFM_running or _init_UKDE_data_connections
       setTimeout @_check_UKDE_connection 1000
     else
       console.log "@DefaultContent = " + @DefaultContent
@@ -68,6 +71,7 @@ class UkdeProvider extends ProviderInterface
 
   _get_lastSavedContent_from_UKDE: ->
     if not _originA
+      _init_UKDE_data_connections -= 1
       console.error "originA is not ready---can't get lastSavedContent"
       return
     $.ajax
@@ -78,9 +82,11 @@ class UkdeProvider extends ProviderInterface
       dataType: 'json'
       success: (data) =>
         @_lastSavedContent = JSON.stringify data
+        _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
+        _init_UKDE_data_connections -= 1
         console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
           JSON.stringify jqXHR.responseJSON
       beforeSend: (xhr) ->
@@ -88,6 +94,7 @@ class UkdeProvider extends ProviderInterface
 
   _getDefaultContent: ->
     if not _originA
+      _init_UKDE_data_connections -= 1
       console.error "originA is not ready---can't get DefaultContent"
       return
     $.ajax
@@ -98,9 +105,11 @@ class UkdeProvider extends ProviderInterface
       dataType: 'json'
       success: (data) =>
         @DefaultContent = JSON.stringify data
+        _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
       error: (jqXHR) ->
+        _init_UKDE_data_connections -= 1
         console.warn "_getDefaultContent ajax error!?: " + JSON.stringify \
           jqXHR.responseJSON
 
