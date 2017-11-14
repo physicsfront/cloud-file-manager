@@ -120,6 +120,7 @@ class UkdeProvider extends ProviderInterface
   # In addition, callback will be invoked (with no arguments) on success.
   _getJWTUCFM = (originA, callback) ->
     _getJWTUCFM_running = true
+    n_UKDE_calls = 0
     update_originA = true
     if originA
       if isString originA
@@ -141,16 +142,24 @@ class UkdeProvider extends ProviderInterface
     call_UKDE = (originA_candidate, retry=false) ->
       if retry
         error_callback = (jqXHR) ->
+          if gotit
+            return
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
             setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
           else
-            _getJWTUCFM_running = false
+            n_UKDE_calls -= 1
+            if n_UKDE_calls is 0
+              _getJWTUCFM_running = false
       else
         error_callback = (jqXHR) ->
-          _getJWTUCFM_running = false
+          if gotit
+            return
+          n_UKDE_calls -= 1
+          if n_UKDE_calls is 0
+            _getJWTUCFM_running = false
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
       $.ajax
@@ -166,8 +175,11 @@ class UkdeProvider extends ProviderInterface
             if update_originA
               _originA = originA_candidate
             gotit = true
+            _getJWTUCFM_running = false
             callback?()
-          _getJWTUCFM_running = false
+          n_UKDE_calls -= 1
+          if n_UKDE_calls is 0
+            _getJWTUCFM_running = false
         error: error_callback
     for url in originA_cands
       if gotit
@@ -175,18 +187,11 @@ class UkdeProvider extends ProviderInterface
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
-      try
-        # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-        window.top.postMessage "ucfmr-heads-up--" + reqkey, url
-        url_OK = true
-      catch e
-        url_OK = false
-      if url_OK
-        # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
-        setTimeout (-> call_UKDE url, true), 500
-        # There is no reason to try other URLs, once we find a working
-        # window.top.
-        break
+      # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
+      window.top.postMessage "ucfmr-heads-up--" + reqkey, url
+      # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
+      setTimeout (-> call_UKDE url, true), 500
+      n_UKDE_calls += 1
 
   _renew_JWT_and_save: (content, metadata, callback, retry=false) ->
     _getJWTUCFM _originA, (=> @save content, metadata, callback, retry)
