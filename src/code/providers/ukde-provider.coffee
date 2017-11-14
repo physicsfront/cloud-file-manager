@@ -16,7 +16,7 @@ class UkdeProvider extends ProviderInterface
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
-      _init_UKDE_connections = 2
+      _init_UKDE_data_connections = 2
       @_getDefaultContent()
       @_get_lastSavedContent_from_UKDE())
     setTimeout @_check_UKDE_connection, 2000
@@ -47,7 +47,8 @@ class UkdeProvider extends ProviderInterface
       a_.push "Failed to get default content from UKDE---trouble ahead..."
     if @_lastSavedContent is undefined
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
-    if a_.length is 0
+    console.log a_.length
+    if not a_.length
       console.log "All is well with UKDE connection---nice!"
       return
     if _getJWTUCFM_running or _init_UKDE_data_connections
