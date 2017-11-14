@@ -18,6 +18,7 @@ class UkdeProvider extends ProviderInterface
     # These calls are made synchronously, since it is important to initialize
     # key variables.
     @_getJWTUCFM null, (=>
+      console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
       @_getDefaultContent false
       @_get_lastSavedContent_from_UKDE false), false
     if _JWTUCFM is undefined or @_originA is undefined
@@ -137,6 +138,7 @@ class UkdeProvider extends ProviderInterface
         success: (data) =>
           if not gotit and data.JWTUCFM
             # UCFM_PROTOCOL: JWTUCFM
+            console.log "Setting _JWTUCFM as '#{data.JWTUCFM}'---good!"
             _JWTUCFM = data.JWTUCFM
             if update_originA
               console.log "Setting _originA as '#{originA_candidate}'---good!"
