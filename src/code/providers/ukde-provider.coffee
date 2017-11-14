@@ -55,10 +55,11 @@ class UkdeProvider extends ProviderInterface
   _get_lastSavedContent_from_UKDE: (async=true) ->
     $.ajax
       type: "GET"
+      processData: false
+      data: JSON.stringify filetype: @ukdeFileType
       url: @_originA + "cfm/doc"
       dataType: 'json'
       contentType: 'application/json'
-      data: JSON.stringify filetype: @ukdeFileType
       success: (data) =>
         @_lastSavedContent = data
         consol.log "File of type '#{@ukdeFileType}' was retrieved " \
@@ -71,10 +72,11 @@ class UkdeProvider extends ProviderInterface
   _getDefaultContent: (async=true) ->
     $.ajax
       type: "GET"
+      processData: false
+      data: JSON.stringify filetype: @ukdeFileType
       url: @_originA + "cfm/default-doc"
       dataType: 'json'
       contentType: 'application/json'
-      data: JSON.stringify filetype: @ukdeFileType
       success: (data) =>
         @DefaultContent = data
         consol.log "Default content of type '#{@ukdeFileType}' was " \
