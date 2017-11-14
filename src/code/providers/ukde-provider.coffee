@@ -177,9 +177,9 @@ class UkdeProvider extends ProviderInterface
             _JWTUCFM = data.JWTUCFM
             if update_originA
               _originA = originA_candidate
+            callback?()
             gotit = true
             _getJWTUCFM_running = false
-            callback?()
           n_UKDE_calls -= 1
           if n_UKDE_calls is 0
             _getJWTUCFM_running = false
