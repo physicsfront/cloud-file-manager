@@ -17,7 +17,7 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
-      @_get_lastSavedContent_from_UKDE())
+      @_getLastSavedContent_from_UKDE())
     setTimeout @_check_UKDE_connection, 2000
     super
       name: UkdeProvider.Name
@@ -44,7 +44,7 @@ class UkdeProvider extends ProviderInterface
       a_.push "Failed to connect to UKDE---trouble ahead..."
     if @DefaultContent is undefined
       a_.push "Failed to get default content from UKDE---trouble ahead..."
-    if @_lastSavedContent is undefined
+    if @LastSavedContent is undefined
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
     console.log a_.length
     if not a_.length
@@ -52,14 +52,17 @@ class UkdeProvider extends ProviderInterface
       return
     if _getJWTUCFM_running or _init_UKDE_data_connections
       console.log "" + _getJWTUCFM_running + ", " + _init_UKDE_data_connections
-      setTimeout (=> @_check_UKDE_connection()), 1000
-      console.log "called: " + @_check_UKDE_connection
+      setTimeout (=> @_check_UKDE_connection_again()), 1000
+      console.log "called: " + @_check_UKDE_connection_again
     else
       console.log "@DefaultContent = " + @DefaultContent
-      console.log "@_lastSavedContent = " + @_lastSavedContent
+      console.log "@LastSavedContent = " + @LastSavedContent
       errstr = a_.join "\n"
       console.error errstr
       alert errstr
+
+  _check_UKDE_connection_again: ->
+    @_check_UKDE_connection()
 
   # UCFM_PROTOCOL: values and formats of possible originA values
   _originA_pool = ['https://ukde.physicsfront.com/',
@@ -72,7 +75,7 @@ class UkdeProvider extends ProviderInterface
   _JWTUCFM = undefined
   _getJWTUCFM_running = false
 
-  _get_lastSavedContent_from_UKDE: ->
+  _getLastSavedContent_from_UKDE: ->
     if not _originA
       _init_UKDE_data_connections -= 1
       console.error "originA is not ready---can't get lastSavedContent"
@@ -84,13 +87,13 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        @_lastSavedContent = JSON.stringify data
+        @LastSavedContent = JSON.stringify data
         _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
         _init_UKDE_data_connections -= 1
-        console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
+        console.warn "_getLastSavedContent_from_UKDE ajax error!?: " + \
           JSON.stringify jqXHR.responseJSON
       beforeSend: (xhr) ->
         xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
@@ -233,14 +236,14 @@ class UkdeProvider extends ProviderInterface
           filetype: @ukdeFileType
           DOCUCFM: unwrapped_content
         success: (data) =>
-          @_lastSavedContent = unwrapped_content
+          @LastSavedContent = unwrapped_content
           console.log "File was saved successfully. Return data='#{data}'."
         error: (jqXHR) =>
           if retry and jqXHR.responseJSON?.error is 'Your JWTUCFM expired.'
             @_renew_JWT_and_save content, metadata, callback
           console.warn "save ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
-      # console.log "== save: #{@_lastSavedContent}"
+      # console.log "== save: #{@LastSavedContent}"
       callback? null
     catch e
       callback? "Unable to save: #{e.message}"
@@ -248,7 +251,7 @@ class UkdeProvider extends ProviderInterface
   load: (metadata, callback) ->
     try
       content = cloudContentFactory.createEnvelopedCloudContent \
-        (@_lastSavedContent or @DefaultContent)
+        (@LastSavedContent or @DefaultContent)
     catch e
       callback? "Unable to load '#{metadata.name}': #{e.message}"
       return

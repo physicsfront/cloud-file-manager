@@ -63,7 +63,7 @@
         cfmClient = client
         cfmContent = document.getElementById ("text").value
         cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
-          ._lastSavedContent
+          .LastSavedContent
         document.getElementById ('open_btn').disabled = false
         document.getElementById ('open_default_btn').disabled = false
         document.getElementById ('save_btn').disabled = true
@@ -218,7 +218,7 @@
             break
          case 'savedFile':
             cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
-               ._lastSavedContent
+               .LastSavedContent
             _checkContentChange ()
             break
         }
