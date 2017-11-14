@@ -29,9 +29,10 @@ class UkdeProvider extends ProviderInterface
         rename: false
         close: true
     @_getJWTUCFM null, (=>
+      _init_UKDE_data_connections = 2
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 2000)
+      setTimeout (=> @_check_UKDE_connection()), 200)
 
   @Name: 'ukde'
 
@@ -42,6 +43,8 @@ class UkdeProvider extends ProviderInterface
 
   _check_UKDE_connection: ->
     console.log "_check_UKDE_connection: called"
+    console.log "function: " + @_check_UKDE_connection
+    console.log "function: " + @_check_UKDE_connection_again
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
       a_.push "Failed to connect to UKDE---trouble ahead..."
