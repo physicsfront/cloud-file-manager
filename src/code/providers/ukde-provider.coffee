@@ -16,7 +16,6 @@ class UkdeProvider extends ProviderInterface
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
-      _init_UKDE_data_connections = 2
       @_getDefaultContent()
       @_get_lastSavedContent_from_UKDE())
     setTimeout @_check_UKDE_connection, 2000
@@ -54,6 +53,7 @@ class UkdeProvider extends ProviderInterface
     if _getJWTUCFM_running or _init_UKDE_data_connections
       console.log "" + _getJWTUCFM_running + ", " + _init_UKDE_data_connections
       setTimeout @_check_UKDE_connection, 1000
+      console.log "called: " + @_check_UKDE_connection
     else
       console.log "@DefaultContent = " + @DefaultContent
       console.log "@_lastSavedContent = " + @_lastSavedContent
