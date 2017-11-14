@@ -20,9 +20,9 @@ class UkdeProvider extends ProviderInterface
     @_getJWTUCFM(null, (=>
       @_getDefaultContent false
       @_get_lastSavedContent_from_UKDE false), false)
-    console.warn "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
+    console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
     if _JWTUCFM is undefined or @_originA is undefined
-      console.warn "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
+      console.log "_JWTUCFM = #{_JWTUCFM}, @_originA = #{@_originA}"
       alert "Failed to connect to UKDE---trouble ahead..."
     else if @DefaultContent is undefined
       alert "Failed to get default content from UKDE---trouble ahead..."
