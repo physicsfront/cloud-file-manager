@@ -136,7 +136,7 @@ class UkdeProvider extends ProviderInterface
   # failure.
   #
   # In addition, callback will be invoked (with no arguments) on success.
-  _getJWTUCFM = (originA, callback) ->
+  _getJWTUCFM: (originA, callback) ->
     _getJWTUCFM_running = true
     n_UKDE_calls = 0
     update_originA = true
