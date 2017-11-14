@@ -53,9 +53,9 @@ class UkdeProvider extends ProviderInterface
       alert errstr
 
   # UCFM_PROTOCOL: values and formats of possible originA values
-  _originA_pool: ['https://ukde.physicsfront.com/',
-                  'https://ukde-stg.physicsfront.com/',
-                  'https://ukde-dev.physicsfront.com/']
+  _originA_pool = ['https://ukde.physicsfront.com/',
+                   'https://ukde-stg.physicsfront.com/',
+                   'https://ukde-dev.physicsfront.com/']
   _originA = undefined
 
   # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
