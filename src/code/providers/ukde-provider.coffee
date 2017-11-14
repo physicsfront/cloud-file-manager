@@ -15,20 +15,10 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     @ukdeFileType = @options.ukdeFileType
-    # These calls are made synchronously, as it is important to initialize
-    # key variables.  jquery may complain via a warning message!
-    @_getJWTUCFM null, (=>
-      @_getDefaultContent false
-      @_get_lastSavedContent_from_UKDE false
-      # WARNING: strange behavior was observed when this if block (6 lines)
-      # is placed at the top scope of the constructor.
-      if _JWTUCFM is undefined or @_originA is undefined
-        alert "Failed to connect to UKDE---trouble ahead..."
-      else if @DefaultContent is undefined
-        alert "Failed to get default content from UKDE---trouble ahead..."
-      else if @_lastSavedContent is undefined
-        alert "Failed to get last saved doc. from UKDE---trouble ahead..."
-      ), false
+    _getJWTUCFM null, (=>
+      @_getDefaultContent()
+      @_get_lastSavedContent_from_UKDE())
+    setTimeout @_check_UKDE_connection, 2000
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -44,23 +34,44 @@ class UkdeProvider extends ProviderInterface
         close: true
 
   @Name: 'ukde'
-  @_defaultContent: {message: '... UKDE is being contacted---please wait ...'}
+
+  _check_UKDE_connection: ->
+    a_ = []
+    if _JWTUCFM is undefined and _originA is undefined
+      a_.push "Failed to connect to UKDE---trouble ahead..."
+    if @DefaultContent is undefined
+      a_.push "Failed to get default content from UKDE---trouble ahead..."
+    if @_lastSavedContent is undefined
+      a_.push "Failed to get last saved document from UKDE---trouble ahead..."
+    if a_.length is 0
+      return
+    if _getJWTUCFM_running
+      setTimeout @_check_UKDE_connection 1000
+    else
+      errstr = a_.join "\n"
+      console.error errstr
+      alert errstr
 
   # UCFM_PROTOCOL: values and formats of possible originA values
-  @_originA_all: ['https://ukde.physicsfront.com/',
+  _originA_pool: ['https://ukde.physicsfront.com/',
                   'https://ukde-stg.physicsfront.com/',
                   'https://ukde-dev.physicsfront.com/']
+  _originA = undefined
 
   # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
   # Hidden in closure; should not be leaked outside this script.
   _JWTUCFM = undefined
+  _getJWTUCFM_running = false
 
-  _get_lastSavedContent_from_UKDE: (async=true) ->
+  _get_lastSavedContent_from_UKDE: ->
+    if not _originA
+      console.error "originA is not ready---can't get lastSavedContent"
+      return
     $.ajax
       type: "GET"
       data:
         filetype: @ukdeFileType
-      url: @_originA + "cfm/doc"
+      url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
         @_lastSavedContent = data
@@ -69,16 +80,18 @@ class UkdeProvider extends ProviderInterface
       error: (jqXHR) ->
         console.warn "_get_lastSavedContent_from_UKDE ajax error!?: " + \
           JSON.stringify jqXHR.responseJSON
-      async: async
       beforeSend: (xhr) ->
         xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
 
-  _getDefaultContent: (async=true) ->
+  _getDefaultContent: ->
+    if not _originA
+      console.error "originA is not ready---can't get DefaultContent"
+      return
     $.ajax
       type: "GET"
       data:
         filetype: @ukdeFileType
-      url: @_originA + "cfm/default-doc"
+      url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
         @DefaultContent = data
@@ -87,24 +100,30 @@ class UkdeProvider extends ProviderInterface
       error: (jqXHR) ->
         console.warn "_getDefaultContent ajax error!?: " + JSON.stringify \
           jqXHR.responseJSON
-      async: async
 
   ##
-  # Call this method without any argument, or with false argument for
-  # originA, to initialize _JWTUCFM and @_originA.  If originA is already
-  # known, then call this method with that as argument.
+  # Calls up UKDE and obtains _JWTUCFM, the authorization token necessary for
+  # all subsequent operations.
   #
-  # On success, it will set _JWTUCFM and, if originA was false, @_originA.
-  # So, these variables will persist over any failed calls of this method.
-  # In addition, `callback` will be invoked on success.
+  # In the process, this private function goes over all possible UKDE base
+  # URLS (_originA_pool).  The first URL that responds successfully will be
+  # remembered as _originA.
   #
-  # This method does nothing on failure.
-  _getJWTUCFM: (originA, callback, async=true) ->
-    console.log "_getJWTUCFM is being called!"
+  # If originA is already known, then call this method with that value as the
+  # first argument.  That value must be one of _originA_pool.
+  #
+  # On success, this function will set _JWTUCFM and, if originA was a false
+  # value, _originA.  So, these variables will persist over any failed calls
+  # of this method, as this function does not touch these variables on
+  # failure.
+  #
+  # In addition, callback will be invoked (with no arguments) on success.
+  _getJWTUCFM = (originA, callback) ->
+    _getJWTUCFM_running = true
     update_originA = true
     if originA
       if isString originA
-        if originA not in UkdeProvider._originA_all
+        if originA not in _originA_pool
           console.error "Illegal value '#{originA}' was passed for originA."
           return
         originA_cands = [originA]
@@ -114,12 +133,12 @@ class UkdeProvider extends ProviderInterface
           + "passed for originA."
         return
     else
-      originA_cands = UkdeProvider._originA_all
+      originA_cands = _originA_pool
     # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
     reqkey = (new Date).getTime() + '--' + \
       Math.round 1000000000000000 * Math.random()
     gotit = false
-    call_UKDE = (originA_candidate, retry=false) =>
+    call_UKDE = (originA_candidate, retry=false) ->
       if retry
         error_callback = (jqXHR) ->
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
@@ -127,8 +146,11 @@ class UkdeProvider extends ProviderInterface
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
             setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
+          else
+            _getJWTUCFM_running = false
       else
         error_callback = (jqXHR) ->
+          _getJWTUCFM_running = false
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
       $.ajax
@@ -137,43 +159,54 @@ class UkdeProvider extends ProviderInterface
         dataType: 'json'
         contentType: 'application/json'
         data: JSON.stringify secret: reqkey
-        success: (data) =>
+        success: (data) ->
           if not gotit and data.JWTUCFM
             # UCFM_PROTOCOL: JWTUCFM
             _JWTUCFM = data.JWTUCFM
             if update_originA
-              @_originA = originA_candidate
+              _originA = originA_candidate
             gotit = true
             callback?()
+          _getJWTUCFM_running = false
         error: error_callback
-        async: async
-        timeout: 3000
     for url in originA_cands
       if gotit
         break
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
-      # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
-      window.top.postMessage "ucfmr-heads-up--" + reqkey, url
-      # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
-      setTimeout (-> call_UKDE url, true), 500
+      try
+        # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
+        window.top.postMessage "ucfmr-heads-up--" + reqkey, url
+        url_OK = true
+      catch e
+        url_OK = false
+      if url_OK
+        # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
+        setTimeout (-> call_UKDE url, true), 500
+        # There is no reason to try other URLs, once we find a working
+        # window.top.
+        break
 
   _renew_JWT_and_save: (content, metadata, callback, retry=false) ->
-    @_getJWTUCFM @_originA, (=> @save content, metadata, callback, retry)
+    _getJWTUCFM _originA, (=> @save content, metadata, callback, retry)
 
   authorized: (authCallback) ->
     authCallback !!_JWTUCFM
 
   save: (content, metadata, callback, retry=true) ->
     try
+      if not _originA
+        throw Error "originA is not ready---can't save"
       #window.localStorage.setItem fileKey, (content.getContentAsJSON?() or content)
       # TODO: String content.  What happens with JSON .codap file?  Call
       # content.getContentAsJSON?() or ...?
       unwrapped_content = content.getContent().content
+      if not isString unwrapped_content
+        throw Error "non-string content?!"
       $.ajax
         type: "POST"
-        url: @_originA + "cfm/doc"
+        url: _originA + "cfm/doc"
         dataType: 'json'
         contentType: 'application/json'
         data: JSON.stringify
