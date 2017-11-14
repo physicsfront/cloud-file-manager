@@ -74,7 +74,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        @_lastSavedContent = data
+        @_lastSavedContent = JSON.stringify data
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
@@ -94,7 +94,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
-        @DefaultContent = data
+        @DefaultContent = JSON.stringify data
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
       error: (jqXHR) ->
