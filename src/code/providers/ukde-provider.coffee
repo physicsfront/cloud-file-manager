@@ -8,6 +8,12 @@ CloudMetadata = (require './provider-interface').CloudMetadata
 class UkdeProvider extends ProviderInterface
 
   # UCFM_PROTOCOL: values and formats of possible originA values
+  # A client is advised to specify one originA through options.originA when
+  # registering this client (see below).  While not harmful at all to leave
+  # originA unspecified, it will lead to some error messages printed out in
+  # console.  In the future, the default behavior will change to originA
+  # defaulting to the production URL only ("pro"), when UKDE is more settled
+  # down.
   _originA_pool =
     pro: 'https://ukde.physicsfront.com/'
     stg: 'https://ukde-stg.physicsfront.com/'
@@ -31,6 +37,7 @@ class UkdeProvider extends ProviderInterface
         alert msg
         throw Error msg
     if "originA" of @options
+      # possible values?---see "throw Error" below.
       if isString @options.originA
         _originA_cands=[ _originA_pool[@options.originA] ]
       else
@@ -48,7 +55,7 @@ class UkdeProvider extends ProviderInterface
     _getJWTUCFM null, (=>
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE())
-    setTimeout (=> @_check_UKDE_connection()), 1000
+    setTimeout (=> @_check_UKDE_connection()), 500
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
