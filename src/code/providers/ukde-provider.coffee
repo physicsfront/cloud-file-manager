@@ -7,6 +7,8 @@ CloudMetadata = (require './provider-interface').CloudMetadata
 
 class UkdeProvider extends ProviderInterface
 
+  _originA_cands = []
+
   constructor: (@options = {}, @client) ->
     if "name" of @options
       if @options.name isnt UkdeProvider.Name
@@ -27,6 +29,7 @@ class UkdeProvider extends ProviderInterface
         throw Error "Too many elements passed to options.originA."
     else
       _originA_cands=(v_ for own k_, v_ of _originA_pool)
+    console.log '_originA_cands = ' + JSON.stringify _originA_cands
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
@@ -80,7 +83,6 @@ class UkdeProvider extends ProviderInterface
     pro: 'https://ukde.physicsfront.com/'
     stg: 'https://ukde-stg.physicsfront.com/'
     dev: 'https://ukde-dev.physicsfront.com/'
-  _originA_cands = []
   _originA = undefined
 
   # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
