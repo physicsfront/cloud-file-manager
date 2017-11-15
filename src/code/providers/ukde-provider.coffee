@@ -7,7 +7,21 @@ CloudMetadata = (require './provider-interface').CloudMetadata
 
 class UkdeProvider extends ProviderInterface
 
+  # UCFM_PROTOCOL: values and formats of possible originA values
+  _originA_pool =
+    pro: 'https://ukde.physicsfront.com/'
+    stg: 'https://ukde-stg.physicsfront.com/'
+    dev: 'https://ukde-dev.physicsfront.com/'
   _originA_cands = []
+  _originA = undefined
+
+  _init_UKDE_data_connections = 2
+  _n_check_UKDE = 0
+
+  # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
+  # Hidden in closure; should not be leaked outside this script.
+  _JWTUCFM = undefined
+  _getJWTUCFM_running_maybe = false
 
   constructor: (@options = {}, @client) ->
     if "name" of @options
@@ -51,9 +65,6 @@ class UkdeProvider extends ProviderInterface
 
   @Name: 'ukde'
 
-  _init_UKDE_data_connections = 2
-  _n_check_UKDE = 0
-
   _check_UKDE_connection: ->
     _n_check_UKDE++
     console.log "_check_UKDE_connection: called---will check!"
@@ -77,18 +88,6 @@ class UkdeProvider extends ProviderInterface
     errstr = a_.join "\n"
     console.error errstr
     alert errstr
-
-  # UCFM_PROTOCOL: values and formats of possible originA values
-  _originA_pool =
-    pro: 'https://ukde.physicsfront.com/'
-    stg: 'https://ukde-stg.physicsfront.com/'
-    dev: 'https://ukde-dev.physicsfront.com/'
-  _originA = undefined
-
-  # UCFM_PROTOCOL: _JWTUCFM is a masked key, still needing to be protected.
-  # Hidden in closure; should not be leaked outside this script.
-  _JWTUCFM = undefined
-  _getJWTUCFM_running_maybe = false
 
   _getLastSavedContent_from_UKDE: ->
     if not _originA
@@ -181,9 +180,8 @@ class UkdeProvider extends ProviderInterface
             jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
-            setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
-            # setTimeout ((this_can) -> not gotit and call_UKDE this_can), \
-            #  1000, originA_candidate
+            setTimeout ((this_can) -> not gotit and call_UKDE this_can), \
+              1000, originA_candidate
           else
             n_UKDE_calls -= 1
             if n_UKDE_calls is 0
@@ -217,17 +215,13 @@ class UkdeProvider extends ProviderInterface
             _getJWTUCFM_running_maybe = false
         error: error_callback
     for url in originA_cands
-      console.log "1: originA candidate url = " + url
       if gotit
         break
-      console.log "2: originA candidate url = " + url
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
-      console.log "3: originA candidate url = " + url
       # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
       window.top.postMessage "ucfmr-heads-up--" + reqkey, url
-      console.log "4: originA candidate url = " + url
       # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
       setTimeout ((this_url) -> call_UKDE this_url, true), 500, url
       n_UKDE_calls += 1
