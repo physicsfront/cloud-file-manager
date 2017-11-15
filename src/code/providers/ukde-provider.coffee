@@ -348,6 +348,6 @@ class UkdeProvider extends ProviderInterface
         return obj
       else
         obj = JSON.parse obj
-    jsststringify obj, space: 3
+    jsststringify obj, space: 2
 
 module.exports = UkdeProvider
