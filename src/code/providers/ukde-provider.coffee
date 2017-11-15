@@ -218,7 +218,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
-        @DefaultContent = JSON.stringify data.DOCUCFM
+        @DefaultContent = data.DOCUCFM
         _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
@@ -239,7 +239,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        @LastSavedContent = JSON.stringify data.DOCUCFM
+        @LastSavedContent = data.DOCUCFM
         _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
