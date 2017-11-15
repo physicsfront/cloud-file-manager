@@ -223,7 +223,7 @@
             connected (event.data.client)
             break
           case 'getContent':
-            event.callback (getContent ())
+            event.callback (JSON.parse (getContent ()))
             break
           case 'openedFile':
             cfmFileOpened = true

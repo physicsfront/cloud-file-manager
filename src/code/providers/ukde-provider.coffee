@@ -1,5 +1,6 @@
 tr = require '../utils/translate'
 isString = require '../utils/is-string'
+jsststringify = require 'json-stable-stringify'
 
 ProviderInterface = (require './provider-interface').ProviderInterface
 cloudContentFactory = (require './provider-interface').cloudContentFactory
@@ -218,7 +219,10 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
-        @DefaultContent = data.DOCUCFM
+        if isString data.DOCUCFM # this is what we expect; should be JSON
+          @DefaultContent = data.DOCUCFM
+        else # make this OK too
+          @DefaultContent = JSON.stringify data.DOCUCFM
         _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
@@ -239,7 +243,10 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        @LastSavedContent = data.DOCUCFM
+        if isString data.DOCUCFM # this is what we expect; should be JSON
+          @LastSavedContent = data.DOCUCFM
+        else # make this OK too
+          @LastSavedContent = JSON.stringify data.DOCUCFM
         _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
@@ -289,6 +296,8 @@ class UkdeProvider extends ProviderInterface
 
   load: (metadata, callback) ->
     try
+      # @LastSavedContent or @DefaultContent are JSON's.  Enveloping will
+      # include parsing JSON.
       content = cloudContentFactory.createEnvelopedCloudContent \
         (@LastSavedContent or @DefaultContent)
     catch e
@@ -310,12 +319,10 @@ class UkdeProvider extends ProviderInterface
     try
       if not _originA
         throw Error "originA is not ready---can't save"
-      #window.localStorage.setItem fileKey, (content.getContentAsJSON?() or content)
-      # TODO: String content.  What happens with JSON .codap file?  Call
-      # content.getContentAsJSON?() or ...?
       unwrapped_content = content.getContent().content
-      if not isString unwrapped_content
-        throw Error "non-string content?!"
+      if not isString unwrapped_content # This is what we expect.
+        unwrapped_content = jsststringify unwrapped_content, space: 3
+      console.log unwrapped_content
       $.ajax
         type: "POST"
         url: _originA + "cfm/doc"
@@ -323,7 +330,7 @@ class UkdeProvider extends ProviderInterface
         contentType: 'application/json'
         data: JSON.stringify
           filetype: @ukdeFileType
-          DOCUCFM: unwrapped_content
+          DOCUCFM: unwrapped_content # DOCUCFM must be JSON
         success: (data) =>
           @LastSavedContent = unwrapped_content
           console.log "File was saved successfully. Return data='#{data}'."
