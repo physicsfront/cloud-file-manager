@@ -228,7 +228,8 @@
           case 'openedFile':
             cfmFileOpened = true
             document.getElementById ("text").readOnly = false
-            setContent (event.data.content)
+            setContent (cfmClient.providers [ukdeProviderName]
+                  .standardDOCUCFMJSON (event.data.content, true))
             focus ()
             if (event.callback) event.callback ()
             break
@@ -238,7 +239,7 @@
             document.getElementById ("text").readOnly = true
          case 'savedFile':
             cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
-               .LastSavedContent
+                  .LastSavedContent
             _checkContentChange ()
             break
         }

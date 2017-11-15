@@ -219,10 +219,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
-        if isString data.DOCUCFM # this is what we expect; should be JSON
-          @DefaultContent = data.DOCUCFM
-        else # make this OK too
-          @DefaultContent = JSON.stringify data.DOCUCFM
+        @DefaultContent = @standardDOCUCFMJSON data.DOCUCFM, true
         _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
@@ -243,10 +240,7 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        if isString data.DOCUCFM # this is what we expect; should be JSON
-          @LastSavedContent = data.DOCUCFM
-        else # make this OK too
-          @LastSavedContent = JSON.stringify data.DOCUCFM
+        @LastSavedContent = @standardDOCUCFMJSON data.DOCUCFM, true
         _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
@@ -320,9 +314,6 @@ class UkdeProvider extends ProviderInterface
       if not _originA
         throw Error "originA is not ready---can't save"
       unwrapped_content = content.getContent().content
-      if not isString unwrapped_content # This is what we expect.
-        unwrapped_content = jsststringify unwrapped_content, space: 3
-      console.log unwrapped_content
       $.ajax
         type: "POST"
         url: _originA + "cfm/doc"
@@ -330,7 +321,7 @@ class UkdeProvider extends ProviderInterface
         contentType: 'application/json'
         data: JSON.stringify
           filetype: @ukdeFileType
-          DOCUCFM: unwrapped_content # DOCUCFM must be JSON
+          DOCUCFM: @standardDOCUCFMJSON unwrapped_content
         success: (data) =>
           @LastSavedContent = unwrapped_content
           console.log "File was saved successfully. Return data='#{data}'."
@@ -345,5 +336,18 @@ class UkdeProvider extends ProviderInterface
       callback? null
     catch e
       callback? "Unable to save: #{e.message}"
+
+  ##
+  # Returns standard "pretty-print" JSON for use with UCFM.  If obj is
+  # already is a string, then it is parsed and then stringified again by
+  # default.  However, if it is a trusted stardard JSON, then trust_str can
+  # be passed a true value, and the string will be returned as is.
+  standardDOCUCFMJSON: (obj, trust_str = false) ->
+    if isString obj
+      if trust_str
+        return obj
+      else
+        obj = JSON.parse obj
+    jsststringify obj, space: 3
 
 module.exports = UkdeProvider
