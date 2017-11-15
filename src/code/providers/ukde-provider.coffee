@@ -179,8 +179,9 @@ class UkdeProvider extends ProviderInterface
             jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
             console.log "handshake with UKDE failed---trying just once more"
-            setTimeout ((this_can) -> not gotit and call_UKDE this_can), \
-              1000, originA_candidate
+            setTimeout (-> not gotit and call_UKDE originA_candidate), 1000
+            # setTimeout ((this_can) -> not gotit and call_UKDE this_can), \
+            #  1000, originA_candidate
           else
             n_UKDE_calls -= 1
             if n_UKDE_calls is 0
@@ -214,13 +215,17 @@ class UkdeProvider extends ProviderInterface
             _getJWTUCFM_running_maybe = false
         error: error_callback
     for url in originA_cands
+      console.log "1: originA candidate url = " + url
       if gotit
         break
+      console.log "2: originA candidate url = " + url
       if not ((url.startsWith "https://") and (url.endsWith "/"))
         console.error "originA candidate url format error; skipping '#{url}'."
         continue
+      console.log "3: originA candidate url = " + url
       # UCFM_PROTOCOL: reqkey is a short-lived secret for handshaking
       window.top.postMessage "ucfmr-heads-up--" + reqkey, url
+      console.log "4: originA candidate url = " + url
       # UCFM_PROTOCOL: call_UKDE after a shor wait for handshake coordination
       setTimeout ((this_url) -> call_UKDE this_url, true), 500, url
       n_UKDE_calls += 1
