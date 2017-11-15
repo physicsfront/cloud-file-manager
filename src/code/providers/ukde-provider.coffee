@@ -164,7 +164,8 @@ class UkdeProvider extends ProviderInterface
     _getJWTUCFM null, (=>
       @_getDefaultContent()
       @_getLastSavedContent_from_UKDE()
-      if @options.autoopen
+      if @options.autoOpen
+        console.log 'auto-opening ukde file ...'
         @client.openProviderFile UkdeProvider.Name, @ukdeFileType)
     # Just passing @_check_UKDE_connection to setTimeout causes problems in
     # recursive calls of @_check_UKDE_connection.  Inside that method, it

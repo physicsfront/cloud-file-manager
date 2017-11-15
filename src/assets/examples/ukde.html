@@ -89,7 +89,6 @@
            saveFile ()
            document.getElementById ("text").readOnly = false
         }
-        console.log (_defaultContent ())
         setContent (_defaultContent ())
         focus ()
       }
@@ -201,29 +200,30 @@
     <!-- <<< body javascript -->
     <script type="text/javascript">
       var clientOptions = {
-        mimeType: "text/plain",
-        appName: "UCFM_Demo",
-        appVersion: "0.1",
-        appBuildNum: "1",
-        providers: [
-         {
-          name : ukdeProviderName,
-          patch : true,
-          ukdeFileType : ukdeFileType, // special option for ukde provider
-          // Opening document as soon as possible ensures well-defined
-          // metadata, which is necessary for UCFM to function properly.
-          autoOpen : true, // This is the default.
-          originA : "dev",
+         mimeType: "text/plain",
+         appName: "UCFM_Demo",
+         appVersion: "0.1",
+         appBuildNum: "1",
+         providers: [
+            {
+               name : ukdeProviderName,
+               patch : true,
+               // special options for ukde provider
+               ukdeFileType : ukdeFileType,
+               // Opening document as soon as possible ensures well-defined
+               // metadata, which is necessary for UCFM to function properly.
+               autoOpen : true, // This is the default.
+               originA : ["dev", "stg"],
+            }
+         ],
+         ui: {
+            newFileOpensInNewTab: false
          }
-        ],
-        ui: {
-         newFileOpensInNewTab: false
-        }
       }
       CloudFileManager.init (clientOptions)
       CloudFileManager.clientConnect (function (event) {
-        console.log (event)
-        switch (event.type) {
+         console.log (event)
+         switch (event.type) {
           case 'connected':
             connected (event.data.client)
             break
@@ -247,19 +247,19 @@
                   .LastSavedContent
             _checkContentChange ()
             break
-        }
+         }
       })
       document.getElementById ("ukde_file_type").innerHTML = '' + ukdeFileType
       ;(function (textarea_id) {
-        const w = document.getElementById (textarea_id)
-        w.focus ()
-        // For some reason, _.debounce will not work if its first argument
-        // is just "_checkContentChange".  Like setTimeout behaves sometimes?
-        const checkCC = _.debounce (function () {
-           _checkContentChange ()
-        }, 500)
-        for (const event_name of ["input", "keyup", "paste"])
-          w.addEventListener (event_name, checkCC)
+         const w = document.getElementById (textarea_id)
+         w.focus ()
+         // For some reason, _.debounce will not work if its first argument
+         // is just "_checkContentChange".  Like setTimeout behaves sometimes?
+         const checkCC = _.debounce (function () {
+            _checkContentChange ()
+         }, 500)
+         for (const event_name of ["input", "keyup", "paste"])
+            w.addEventListener (event_name, checkCC)
       })("text")
       document.getElementById ("text").readOnly = true
     </script>
