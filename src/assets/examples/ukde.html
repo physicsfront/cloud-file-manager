@@ -27,7 +27,7 @@
     <!-- >>>> -->
     <!-- <<< javascript -->
     <script type="text/javascript">
-      var cfmClient, cfmContent, cfmContentLastSaved
+      var cfmClient, cfmContent, cfmContentLastSaved, cfmFileOpened
       const ukdeProviderName = 'ukde'
       const ukdeFileType = 'rampgame'
 
@@ -47,13 +47,14 @@
       function _checkContentChange (content) {
         if (content === undefined) content = getContent ()
         document.getElementById ('save_btn').disabled =
-          (content === cfmContent)
+          (cfmFileOpened && content === cfmContent)
         document.getElementById ('open_btn').disabled =
-          (content === cfmContentLastSaved)
+          (cfmFileOpened && content === cfmContentLastSaved)
         _setOpenDefaultBtnState (content)
       }
 
       function _setOpenDefaultBtnState (content) {
+        document.getElementById ('close_btn').disabled = ! cfmFileOpened
         if (content === undefined) content = getContent ()
         document.getElementById ('open_default_btn').disabled =
            (content === _defaultContent ())
@@ -67,6 +68,11 @@
         document.getElementById ('open_btn').disabled = false
         document.getElementById ('open_default_btn').disabled = false
         document.getElementById ('save_btn').disabled = true
+        document.getElementById ('close_btn').disabled = true
+      }
+
+      function closeFile () {
+        cfmClient && cfmClient.closeFile ()
       }
 
       function focus () {
@@ -78,7 +84,14 @@
       }
 
       function openDefaultFile () {
+        if (! cfmFileOpened) {
+           cfmFileOpened = true
+           saveFile ()
+           document.getElementById ("text").readOnly = false
+        }
+        console.log (_defaultContent ())
         setContent (_defaultContent ())
+        focus ()
       }
 
       function openFile () {
@@ -181,6 +194,7 @@
       <button onclick="openDefaultFile ()" id=open_default_btn>
          Load Default</button>
       <button onclick="saveFile ()" id=save_btn>Save</button>
+      <button onclick="closeFile ()" id=close_btn>Close</button>
     </div>
     <!-- >>>> -->
     <!-- <<< body javascript -->
@@ -212,10 +226,16 @@
             event.callback (getContent ())
             break
           case 'openedFile':
-            setContent (event.data.content)
+            cfmFileOpened = true
+            document.getElementById ("text").readOnly = false
+            setContent (JSON.stringify (event.data.content))
             focus ()
             if (event.callback) event.callback ()
             break
+         case 'closedFile':
+            cfmFileOpened = false
+            setContent ('')
+            document.getElementById ("text").readOnly = true
          case 'savedFile':
             cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
                .LastSavedContent
@@ -228,13 +248,15 @@
         const w = document.getElementById (textarea_id)
         w.focus ()
         // For some reason, _.debounce will not work well if its first
-        // argument is just "_checkContentChange".
+        // argument is just "_checkContentChange".  Maybe just like
+        // similar problems with setTimeout?
         const checkCC = _.debounce (function () {
            _checkContentChange ()
         }, 500)
         for (const event_name of ["input", "keyup", "paste"])
           w.addEventListener (event_name, checkCC)
       })("text")
+      document.getElementById ("text").readOnly = true
       // file should be opened automatically; metadata must be set to a valid
       // value in order for UCFM and this page to function properly.
       openFile ()
