@@ -228,7 +228,7 @@
           case 'openedFile':
             cfmFileOpened = true
             document.getElementById ("text").readOnly = false
-            setContent (JSON.stringify (event.data.content))
+            setContent (event.data.content)
             focus ()
             if (event.callback) event.callback ()
             break
