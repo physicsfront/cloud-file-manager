@@ -229,7 +229,7 @@
             cfmFileOpened = true
             document.getElementById ("text").readOnly = false
             setContent (cfmClient.providers [ukdeProviderName]
-                  .standardDOCUCFMJSON (event.data.content, false))
+                  .standardDOCUCFMJSON (event.data.content, true))
             focus ()
             if (event.callback) event.callback ()
             break
