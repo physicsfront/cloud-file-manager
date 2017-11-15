@@ -157,11 +157,15 @@ class UkdeProvider extends ProviderInterface
         throw Error "Too many elements passed to options.originA."
     else
       _originA_cands=(v_ for own k_, v_ of _originA_pool)
+    if "autoOpen" not of @options
+      @options.autoOpen = true
     console.log '_originA_cands = ' + JSON.stringify _originA_cands
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE())
+      @_getLastSavedContent_from_UKDE()
+      if @options.autoopen
+        @client.openProviderFile UkdeProvider.Name, @ukdeFileType)
     # Just passing @_check_UKDE_connection to setTimeout causes problems in
     # recursive calls of @_check_UKDE_connection.  Inside that method, it
     # turns out @_check_UKDE_connection is undefined!  Some sort of scope

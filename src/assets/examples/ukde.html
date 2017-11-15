@@ -95,7 +95,8 @@
       }
 
       function openFile () {
-        cfmClient && cfmClient.openProviderFile ('ukde', ukdeFileType)
+        cfmClient && cfmClient.openProviderFile (ukdeProviderName,
+              ukdeFileType)
       }
 
       function saveFile () {
@@ -206,9 +207,13 @@
         appBuildNum: "1",
         providers: [
          {
-          "name": ukdeProviderName,
-          "patch": true,
-          "ukdeFileType": ukdeFileType // special option for ukde provider
+          name : ukdeProviderName,
+          patch : true,
+          ukdeFileType : ukdeFileType, // special option for ukde provider
+          // Opening document as soon as possible ensures well-defined
+          // metadata, which is necessary for UCFM to function properly.
+          autoOpen : true, // This is the default.
+          originA : "dev",
          }
         ],
         ui: {
@@ -248,9 +253,8 @@
       ;(function (textarea_id) {
         const w = document.getElementById (textarea_id)
         w.focus ()
-        // For some reason, _.debounce will not work well if its first
-        // argument is just "_checkContentChange".  Maybe just like
-        // similar problems with setTimeout?
+        // For some reason, _.debounce will not work if its first argument
+        // is just "_checkContentChange".  Like setTimeout behaves sometimes?
         const checkCC = _.debounce (function () {
            _checkContentChange ()
         }, 500)
@@ -258,9 +262,6 @@
           w.addEventListener (event_name, checkCC)
       })("text")
       document.getElementById ("text").readOnly = true
-      // file should be opened automatically; metadata must be set to a valid
-      // value in order for UCFM and this page to function properly.
-      openFile ()
     </script>
     <!-- >>> -->
   </body>
