@@ -47,8 +47,8 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE()
-      setTimeout (=> @_check_UKDE_connection()), 100)
+      @_getLastSavedContent_from_UKDE())
+    setTimeout (=> @_check_UKDE_connection()), 1000
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -79,7 +79,7 @@ class UkdeProvider extends ProviderInterface
       console.log "_check_UKDE_connection: all is well---nice!"
       return
     if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
-      if _n_check_UKDE <= 25 # so, it is a total 5 sec. wait plus init wait
+      if _n_check_UKDE <= 25 # so, it is a total 6 (= 5 + 1) sec wait.
         setTimeout (=> @_check_UKDE_connection()), 200
         console.log "_check_UKDE_connection: will be called again..."
         return
