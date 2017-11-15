@@ -163,10 +163,7 @@ class UkdeProvider extends ProviderInterface
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE()
-      if @options.autoOpen
-        console.log 'auto-opening ukde file ...'
-        @client.openProviderFile UkdeProvider.Name, @ukdeFileType)
+      @_getLastSavedContent_from_UKDE())
     # Just passing @_check_UKDE_connection to setTimeout causes problems in
     # recursive calls of @_check_UKDE_connection.  Inside that method, it
     # turns out @_check_UKDE_connection is undefined!  Some sort of scope
@@ -200,6 +197,9 @@ class UkdeProvider extends ProviderInterface
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
     if not a_.length
       console.log "_check_UKDE_connection: all is well---nice!"
+      if @options.autoOpen
+        console.log '_check_UKDE_connection: auto-opening ukde file...'
+        @client.openProviderFile UkdeProvider.Name, @ukdeFileType
       return
     if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
       if _n_check_UKDE <= 20 # so, it is a total 5 (= 4 + 1) sec wait.
