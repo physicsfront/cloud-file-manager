@@ -200,6 +200,7 @@ class UkdeProvider extends ProviderInterface
       a_.push "Failed to get last saved document from UKDE---trouble ahead..."
     if not a_.length
       console.log "_check_UKDE_connection: all is well---nice!"
+      _OK = true # this occurs with a time-lag; see below
       if @options.autoOpen
         console.log '_check_UKDE_connection: auto-opening ukde file...'
         @client.openProviderFile UkdeProvider.Name, @ukdeFileType
@@ -209,7 +210,6 @@ class UkdeProvider extends ProviderInterface
         setTimeout (=> @_check_UKDE_connection()), 250
         console.log "_check_UKDE_connection: script may be busy... will " \
           + "wait a little and call again."
-        _OK = true # this occurs with a time-lag; see below
         return
     console.warn "_check_UKDE_connection: not all is well... reporting " \
       + "problem(s)..."
