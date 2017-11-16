@@ -93,7 +93,7 @@
       function _check_last_save (tmax = 3) {
          if (! _saving) return 0
          var now = (new Date).getTime ()
-         if (now - _saving) > tmax
+         if (now - _saving > tmax)
             alert ('The last saving operation did not succeed?!')
          return now
       }
