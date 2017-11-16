@@ -32,6 +32,14 @@
       const ukdeProviderName = 'ukde'
       const ukdeFileType = 'rampgame'
 
+      function _check_last_save (tmax = 3) {
+         if (! _saving) return 0
+         var now = (new Date).getTime ()
+         if (now - _saving > tmax)
+            alert ('The last saving operation did not succeed?!')
+         return now
+      }
+
       const _defaultContent = (function () { // singlton function
          var ans = ""
          function get_default_content () {
@@ -45,9 +53,10 @@
          return { get: get_default_content }
       })().get
 
-      function enableWidgetsOrNot (content) {
+      function _enableWidgetsOrNot (content) {
+         // content, if passed, is trusted as the current content.
          const OK = working ()
-         document.getElementById ('text').readOnly =
+         document.getElementById ('text').disabled =
             ! OK || ! cfmFileOpened
          document.getElementById ('close_btn').disabled =
             ! OK || ! cfmFileOpened
@@ -61,7 +70,7 @@
       function connected (client) {
          cfmClient = client
          ucfmProvider = client.providers [ukdeProviderName]
-         enableWidgetsOrNot ()
+         _enableWidgetsOrNot ()
       }
 
       function closeFile () {
@@ -89,14 +98,6 @@
          cfmClient.openProviderFile (ukdeProviderName, ukdeFileType)
       }
 
-      function _check_last_save (tmax = 3) {
-         if (! _saving) return 0
-         var now = (new Date).getTime ()
-         if (now - _saving > tmax)
-            alert ('The last saving operation did not succeed?!')
-         return now
-      }
-
       function saveFileIfNeeded (check_last_save = true) {
          if (! working ()) return
          const curContent = getContent ()
@@ -113,7 +114,7 @@
 
       function setContent (cfmContent) {
          document.getElementById ("text").value = cfmContent
-         enableWidgetsOrNot (cfmContent)
+         _enableWidgetsOrNot (cfmContent)
       }
 
       function working () {
@@ -156,31 +157,15 @@
           If user tries to open the same document in multiple clients, then
           only the first client will be able to run the document.  However,
           later client instances may be given an option to override and take
-          over the session (TBD).
+          over the session (TBD/TODO).
         </li>
         <li>
           User document is autosaved whenever <tt>ukde</tt> is notified of
           any change to save.  So, when user logs out of UKDE and logs in
           again later, the activity will continue right where it was left
-          off.  (How about an anonymous user?  Give a one-time only
-          document?)
-          <ul>
-            <li>
-              In this demo, this autosave mechanism is <i>not</i>
-              implemented.  Rather, this demo shows how it recognizes that
-              there are saveable changes in the content or not (the "Save"
-              button will become clickable, only if there are).  In the
-              production software, there will be no "Save" button like in
-              this demo and the code will just save the data instead of
-              notifying the user to save.
-            </li>
-            <li>
-              Also, in this demo, the changes in content are ephemeral
-              between sessions, as the test content below is actually
-              <i>not</i> saved in any persistent data base yet.  The changes
-              are recognized within a session, but not between sessions.
-            </li>
-          </ul>
+          off.  (How about an anonymous user?  Give a one-time only document?
+          However, currently UKDE does not allow anonymous users much
+          access to most of its pages.)
         </li>
         <li>
           User is allowed to reload the default document of a given file type
@@ -197,13 +182,14 @@
       &ldquo;<span id=ukde_file_type>--unknown?--</span>.&rdquo;
     </p>
     <div>
-      <textarea cols="50" rows="10" id="text"></textarea>
+      <textarea cols="50" rows="24" id="text"></textarea>
     </div>
     <div id="buttons">
       <button onclick="openFile ()" id=open_btn>Open My Document</button>
       <button onclick="openDefaultFile ()" id=open_default_btn>
          Open Default Document</button>
       <button onclick="closeFile ()" id=close_btn>Close My Document</button>
+      <!-- TODO: allow taking the ownership of the file. -->
     </div>
     <!-- >>>> -->
     <!-- <<< body javascript -->
@@ -267,12 +253,12 @@
          // "_checkContentChange".  Like setTimeout behaves sometimes?
          const checkCC = _.debounce (function () {
             saveFileIfNeeded ()
-            enableWidgetsOrNot ()
+            _enableWidgetsOrNot ()
          }, 500)
          for (const event_name of ["input", "keyup", "paste"])
             w.addEventListener (event_name, checkCC)
       })("text")
-      document.getElementById ("text").readOnly = true
+      // does this work?  will see...
       window.addEventListener ("beforeunload", function (event) {
          if (cfmFileOpened) {
             saveFileIfNeeded (false)

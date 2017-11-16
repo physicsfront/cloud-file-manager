@@ -372,6 +372,8 @@ class UkdeProvider extends ProviderInterface
         obj = JSON.parse obj
     jsststringify obj, space: 3
 
+  ##
+  # If this method returns false, UCFM is not working correctly for the user.
   working: ->
     _OK
 
