@@ -162,10 +162,18 @@ class UkdeProvider extends ProviderInterface
       _originA_cands=(v_ for own k_, v_ of _originA_pool)
     if "autoOpen" not of @options
       @options.autoOpen = true
+    if "anonymous" not of @options
+      @options.anonymous = false
     @ukdeFileType = @options.ukdeFileType
-    _getJWTUCFM null, (=>
+    if @options.anonymous
+      _originA = _originA_cands[0]
+      _init_UKDE_data_connections = 1
       @_getDefaultContent()
-      @_getLastSavedContent_from_UKDE())
+    else
+      _getJWTUCFM null, (=>
+        _init_UKDE_data_connections = 2
+        @_getDefaultContent()
+        @_getLastSavedContent_from_UKDE())
     # Just passing @_check_UKDE_connection to setTimeout causes problems in
     # recursive calls of @_check_UKDE_connection.  Inside that method, it
     # turns out @_check_UKDE_connection is undefined!  Some sort of scope
@@ -192,12 +200,14 @@ class UkdeProvider extends ProviderInterface
     _n_check_UKDE++
     console.log "_check_UKDE_connection: called to duty---will do!"
     a_ = []
-    if _JWTUCFM is undefined and _originA is undefined
-      a_.push "Failed to connect to UKDE---trouble ahead..."
+    if not @options.anonymous
+      if _JWTUCFM is undefined and _originA is undefined
+        a_.push "Failed to connect to UKDE---trouble ahead..."
     if @DefaultContent is undefined
       a_.push "Failed to get default content from UKDE---trouble ahead..."
-    if @LastSavedContent is undefined
-      a_.push "Failed to get last saved document from UKDE---trouble ahead..."
+    if not @options.anonymous
+      if @LastSavedContent is undefined
+        a_.push "Failed to get last saved document from UKDE---trouble ahead..."
     if not a_.length
       console.log "_check_UKDE_connection: all is well---nice!"
       _OK = true # this occurs with a time-lag; see below
@@ -236,15 +246,17 @@ class UkdeProvider extends ProviderInterface
         _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
+        if @options.anonymous
+          _OK = true
       error: (jqXHR) ->
         _init_UKDE_data_connections -= 1
         console.warn "_getDefaultContent ajax error!?: " + JSON.stringify \
           jqXHR.responseJSON
 
   _getLastSavedContent_from_UKDE: ->
-    if not _originA
+    if not _originA or not _JWTUCFM
       _init_UKDE_data_connections -= 1
-      console.error "originA is not ready---can't get lastSavedContent"
+      console.error "originA/jwt is not ready---can't get lastSavedContent"
       return
     $.ajax
       type: "GET"
@@ -279,8 +291,8 @@ class UkdeProvider extends ProviderInterface
   canOpenSaved: -> true
 
   close: (metadata, callback) ->
-    if not _originA
-      throw Error "originA is not ready---can't save"
+    if not _originA or not _JWTUCFM
+      throw Error "originA/jwt is not ready---can't save"
     $.ajax
       type: "POST"
       url: _originA + "cfm/doc"
@@ -328,8 +340,8 @@ class UkdeProvider extends ProviderInterface
 
   save: (content, metadata, callback, retry=true) ->
     try
-      if not _originA
-        throw Error "originA is not ready---can't save"
+      if not _originA or not _JWTUCFM
+        throw Error "originA/jwt is not ready---can't save"
       unwrapped_content = content.getContent().content
       unwrapped_content_json = unwrapped_content
       if isString unwrapped_content_json
