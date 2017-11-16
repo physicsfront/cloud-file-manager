@@ -44,7 +44,7 @@
          if (now - _saving > tmax)
             strs.push ("There were saving requests that did not go through?!")
          if (failedSaves > _failedSaves)
-            strs.push ("There were UKDE saving operations that did not "
+            strs.push ("There were UKDE saving operations that did not " +
                      "succeed?!")
          _failedSaves = failedSaves
          if (strs.length)
