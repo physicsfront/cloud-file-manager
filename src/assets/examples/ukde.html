@@ -208,7 +208,6 @@
       }
       CloudFileManager.init (clientOptions)
       CloudFileManager.clientConnect (function (event) {
-         const ukdeProvider = cfmClient.providers [ukdeProviderName]
          console.log (event)
          switch (event.type) {
           case 'connected':
@@ -220,8 +219,8 @@
           case 'openedFile':
             cfmFileOpened = true
             document.getElementById ("text").readOnly = false
-            cfmContentLastSaved = ukdeProvider.standardDOCUCFMJSON
-                  (event.data.content)
+            cfmContentLastSaved = cfmClient.providers [ukdeProviderName]
+                  .standardDOCUCFMJSON (event.data.content)
             setContent (cfmContentLastSaved)
             focus ()
             if (event.callback) event.callback ()
@@ -233,6 +232,7 @@
             setContent ("")
             break
          case 'savedFile':
+            const ukdeProvider = cfmClient.providers [ukdeProviderName]
             cfmContentLastSaved = ukdeProvider.standardDOCUCFMJSON (
                   ukdeProvider.LastSavedContent)
             break
