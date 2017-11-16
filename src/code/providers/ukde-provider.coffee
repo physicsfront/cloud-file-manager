@@ -88,7 +88,7 @@ class UkdeProvider extends ProviderInterface
           console.warn "_getJWTUCFM ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
           if not gotit and jqXHR.responseJSON?.error is 'no-such-secret'
-            console.log "handshake with UKDE failed---trying just once more"
+            console.log "handshake with UKDE failed---trying one more time"
             setTimeout ((this_cand) -> not gotit and call_UKDE this_cand), \
               1000, originA_candidate
           else
@@ -159,7 +159,6 @@ class UkdeProvider extends ProviderInterface
       _originA_cands=(v_ for own k_, v_ of _originA_pool)
     if "autoOpen" not of @options
       @options.autoOpen = true
-    console.log '_originA_cands = ' + JSON.stringify _originA_cands
     @ukdeFileType = @options.ukdeFileType
     _getJWTUCFM null, (=>
       @_getDefaultContent()
@@ -187,7 +186,7 @@ class UkdeProvider extends ProviderInterface
 
   _check_UKDE_connection: ->
     _n_check_UKDE++
-    console.log "_check_UKDE_connection: called---will check!"
+    console.log "_check_UKDE_connection: called to duty---will do!"
     a_ = []
     if _JWTUCFM is undefined and _originA is undefined
       a_.push "Failed to connect to UKDE---trouble ahead..."
@@ -202,11 +201,12 @@ class UkdeProvider extends ProviderInterface
         @client.openProviderFile UkdeProvider.Name, @ukdeFileType
       return
     if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
-      if _n_check_UKDE <= 20 # so, it is a total 5 (= 4 + 1) sec wait.
-        setTimeout (=> @_check_UKDE_connection()), 200
-        console.log "_check_UKDE_connection: will be called again..."
+      if _n_check_UKDE <= 16 # so, it is a total 5 (= 4 + 1) sec wait.
+        setTimeout (=> @_check_UKDE_connection()), 250
+        console.log "_check_UKDE_connection: script may be busy... will " \
+          + "wait a little and call again."
         return
-    console.log "_check_UKDE_connection: not all is well... reporting " \
+    console.warn "_check_UKDE_connection: not all is well... reporting " \
       + "problem(s)..."
     errstr = a_.join "\n"
     console.error errstr
@@ -224,7 +224,10 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/default-doc"
       dataType: 'json'
       success: (data) =>
-        @DefaultContent = @standardDOCUCFMJSON data.DOCUCFM, true
+        data = data.DOCUCFM
+        if isString data
+          data = JSON.parse data
+        @DefaultContent = data
         _init_UKDE_data_connections -= 1
         console.log "Default content of type '#{@ukdeFileType}' was " \
           + "retrieved successfully from UKDE."
@@ -245,7 +248,10 @@ class UkdeProvider extends ProviderInterface
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
-        @LastSavedContent = @standardDOCUCFMJSON data.DOCUCFM, true
+        data = data.DOCUCFM
+        if isString data
+          data = JSON.parse data
+        @LastSavedContent = data
         _init_UKDE_data_connections -= 1
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
@@ -295,8 +301,7 @@ class UkdeProvider extends ProviderInterface
 
   load: (metadata, callback) ->
     try
-      # @LastSavedContent or @DefaultContent are JSON's.  Enveloping will
-      # include parsing JSON.
+      # @LastSavedContent or @DefaultContent are objects, not JSON's anymore.
       content = cloudContentFactory.createEnvelopedCloudContent \
         (@LastSavedContent or @DefaultContent)
     catch e
@@ -319,6 +324,11 @@ class UkdeProvider extends ProviderInterface
       if not _originA
         throw Error "originA is not ready---can't save"
       unwrapped_content = content.getContent().content
+      unwrapped_content_json = unwrapped_content
+      if isString unwrapped_content_json
+        unwrapped_content = JSON.parse (unwrapped_content)
+      else
+        unwrapped_content_json = JSON.stringify (unwrapped_content_json)
       $.ajax
         type: "POST"
         url: _originA + "cfm/doc"
@@ -326,10 +336,11 @@ class UkdeProvider extends ProviderInterface
         contentType: 'application/json'
         data: JSON.stringify
           filetype: @ukdeFileType
-          DOCUCFM: @standardDOCUCFMJSON unwrapped_content
+          DOCUCFM: unwrapped_content_json
         success: (data) =>
           @LastSavedContent = unwrapped_content
-          console.log "File was saved successfully. Return data='#{data}'."
+          console.log "File was saved successfully.  Return " + \
+            "data='#{JSON.stringify data}'."
         error: (jqXHR) =>
           if retry and jqXHR.responseJSON?.error is 'Your JWTUCFM expired.'
             @_renew_JWT_and_save content, metadata, callback
@@ -337,7 +348,6 @@ class UkdeProvider extends ProviderInterface
             jqXHR.responseJSON
         beforeSend: (xhr) ->
           xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
-      # console.log "== save: #{@LastSavedContent}"
       callback? null
     catch e
       callback? "Unable to save: #{e.message}"
@@ -347,6 +357,9 @@ class UkdeProvider extends ProviderInterface
   # already is a string, then it is parsed and then stringified again by
   # default.  However, if it is a trusted stardard JSON, then trust_str can
   # be passed a true value, and the string will be returned as is.
+  #
+  # This method is currently not used in this module.  It is kept here as a
+  # utiltiy method.
   standardDOCUCFMJSON: (obj, trust_str = false) ->
     if isString obj
       if trust_str
