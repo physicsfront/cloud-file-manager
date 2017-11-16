@@ -46,8 +46,11 @@
             strs.push ("There were UKDE saving operations that did not " +
                      "succeed?!")
          _failedSaves = failedSaves
-         if (strs.length)
+         if (strs.length) {
+            strs.push ("This is a serious error, as your work will not " +
+                  "persist.  Please notify admin.")
             alert (strs.join ("\n\n"))
+         }
          return now
       }
 
