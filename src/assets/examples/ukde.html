@@ -108,7 +108,7 @@
       }
 
       function saveFileIfNeeded (check_last_save = true) {
-         if (! working ()) return
+         if (anonymous || ! working ()) return
          const curContent = getContent ()
          if (curContent !== cfmContentLastSaved) {
             var now
@@ -159,9 +159,7 @@
         <li>
           User document should be autosaved whenever there is any change to
           save.  So, between logins, the activity will continue right where
-          it was left off.  (How about an anonymous user?  Give a one-time
-          only document?  However, currently UKDE does not allow anonymous
-          users much access to most of its pages.)
+          it was left off.
         </li>
         <li>
           User is allowed to reload the default document of a given file type
@@ -173,6 +171,11 @@
           reload the default document, deleting a document is not really
           necessary.
         </li>
+        <li>
+          Anonymous user can also access <tt>ukde-cfm</tt>.  However, in this
+          case only the default document is given.  The activity will be
+          completely ephemeral, since it will never be saved.
+        </li>
       </ul>
       The file type for this demo is
       &ldquo;<span id=ukde_file_type>--unknown?--</span>.&rdquo;  In this
@@ -183,9 +186,9 @@
       <textarea cols="50" rows="30" id=text></textarea>
     </div>
     <div id="buttons">
-      <button onclick="openFile ()" id=open_btn>Open My Document</button>
       <button onclick="openDefaultFile ()" id=open_default_btn>
          Open Default Document</button>
+      <button onclick="openFile ()" id=open_btn>Open My Document</button>
       <button onclick="closeFile ()" id=close_btn>Close My Document</button>
       <!-- TODO: allow taking the ownership of the file. -->
     </div>
@@ -193,6 +196,16 @@
     <!-- >>>> -->
     <!-- <<< body javascript -->
     <script type="text/javascript">
+      var anonymous = false
+      var search_str = window.location.search
+      if (search_str.startsWith ("?"))
+         search_str = search_str.substring (1)
+
+         const searchPars = new URLSearchParams (search_str)
+         anonymous = searchPars.has ("anonymous")
+         console.log ("anonymous=" + anonymous)
+
+      console.log ('search=' + window.location.search)
       var clientOptions = {
          mimeType: "text/plain",
          appName: "UCFM_Demo",
@@ -208,6 +221,7 @@
                // metadata, which is necessary for UCFM to function properly.
                // autoOpen : true, // This is the default.
                originA : "dev", // default is going through all
+               anonymous : anonymous,
             }
          ],
          ui: {
@@ -267,9 +281,14 @@
             document.getElementById ("demo_area").innerHTML =
                "<p id=error>This DEMO is completely disabled; its contact " +
                "with UKDE did not succeed.  " +
-               "NOTE: this page works only if it is " +
-               "embedded correctly inside a working UKDE page.</p>"
+               "NOTE: this page in normal mode works only if it is " +
+               "embedded correctly inside a working UKDE page.  You may " +
+               "try the anonymous mode (use '?anonymous' in URL).</p>"
       }, 6000)
+      if (anonymous) {
+         document.getElementById ('close_btn').style.visibility = "hidden"
+         document.getElementById ('open_btn').style.visibility = "hidden"
+      }
     </script>
     <!-- >>> -->
   </body>
