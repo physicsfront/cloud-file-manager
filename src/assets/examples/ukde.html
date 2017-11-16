@@ -258,12 +258,10 @@
          for (const event_name of ["input", "keyup", "paste"])
             w.addEventListener (event_name, checkCC)
       })("text")
-      // does this work?  will see...
       window.addEventListener ("beforeunload", function (event) {
-         if (cfmFileOpened) {
-            saveFileIfNeeded (false)
-            closeFile ()
-         }
+         if (cfmFileOpened)
+            return "Your file is not closed---this will cause problems." \
+               + "  Are you sure you want to exit this page?"
          return null
       })
     </script>
