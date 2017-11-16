@@ -256,6 +256,7 @@ class UkdeProvider extends ProviderInterface
           data = JSON.parse data
         @LastSavedContent = data
         _init_UKDE_data_connections -= 1
+        _OK = true
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
