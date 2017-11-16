@@ -41,6 +41,8 @@ class UkdeProvider extends ProviderInterface
   _JWTUCFM = undefined
   _getJWTUCFM_running_maybe = false
 
+  _OK = false
+
   ##
   # Calls up UKDE and obtains _JWTUCFM, the authorization token necessary for
   # all subsequent operations.
@@ -199,6 +201,7 @@ class UkdeProvider extends ProviderInterface
       if @options.autoOpen
         console.log '_check_UKDE_connection: auto-opening ukde file...'
         @client.openProviderFile UkdeProvider.Name, @ukdeFileType
+      _OK = true
       return
     if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
       if _n_check_UKDE <= 16 # so, it is a total 5 (= 4 + 1) sec wait.
@@ -367,5 +370,8 @@ class UkdeProvider extends ProviderInterface
       else
         obj = JSON.parse obj
     jsststringify obj, space: 3
+
+  working: ->
+    _OK
 
 module.exports = UkdeProvider
