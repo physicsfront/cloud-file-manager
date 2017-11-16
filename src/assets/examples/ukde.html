@@ -28,6 +28,7 @@
     <!-- <<< javascript -->
     <script type="text/javascript">
       var cfmClient, ucfmProvider, cfmFileOpened, cfmContentLastSaved
+      var _saving = 0
       const ukdeProviderName = 'ukde'
       const ukdeFileType = 'rampgame'
 
@@ -46,6 +47,7 @@
 
       function enableWidgetsOrNot (content) {
          const OK = working ()
+         console.log ("OK=" + OK + ", cfmFileOpened=" + cfmFileOpened)
          document.getElementById ('text').readOnly =
             ! OK || ! cfmFileOpened
          document.getElementById ('close_btn').disabled =
@@ -88,11 +90,26 @@
          cfmClient.openProviderFile (ukdeProviderName, ukdeFileType)
       }
 
-      function saveFileIfNeeded () {
+      function _check_last_save (tmax = 3) {
+         if (! _saving) return 0
+         var now = (new Date).getTime ()
+         if (now - _saving) > tmax
+            alert ('The last saving operation did not succeed?!')
+         return now
+      }
+
+      function saveFileIfNeeded (check_last_save = true) {
          if (! working ()) return
          const curContent = getContent ()
-         if (curContent !== cfmContentLastSaved)
+         if (curContent !== cfmContentLastSaved) {
+            var now
+            if (check_last_save) now = _check_last_save ()
+            if (! now)
+               now = (new Date).getTime ()
+            _saving = now
             cfmClient.saveFileNoDialog (curContent, cfmClient.state.metadata)
+            setTimeout (function () { _check_last_save () }, 3300)
+         }
       }
 
       function setContent (cfmContent) {
@@ -236,6 +253,7 @@
             setContent ("")
             break
          case 'savedFile':
+            _saving = 0
             cfmContentLastSaved = ucfmProvider.standardDOCUCFMJSON
                   (ucfmProvider.LastSavedContent)
             break
@@ -257,7 +275,7 @@
       document.getElementById ("text").readOnly = true
       window.onbeforeunload = function (event) {
          if (cfmFileOpened) {
-            saveFileIfNeeded ()
+            saveFileIfNeeded (false)
             closeFile ()
          }
          return null
