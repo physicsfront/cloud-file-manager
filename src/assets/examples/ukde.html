@@ -52,7 +52,9 @@
             ! OK || ! cfmFileOpened
          document.getElementById ('close_btn').disabled =
             ! OK || ! cfmFileOpened
-         if (content === undefined) content = getContent ()
+         document.getElementById ('open_btn').disabled =
+            ! OK || cfmFileOpened
+         if (content === undefined && OK) content = getContent ()
          document.getElementById ('open_default_btn').disabled =
             ! OK || content === _defaultContent ()
       }
@@ -83,8 +85,6 @@
          focus ()
       }
 
-      // This function is no longer in use.  By default, open is automatic in
-      // UCFM.
       function openFile () {
          if (! cfmClient) return
          cfmClient.openProviderFile (ukdeProviderName, ukdeFileType)
@@ -201,8 +201,9 @@
       <textarea cols="50" rows="10" id="text"></textarea>
     </div>
     <div id="buttons">
+      <button onclick="openFile ()" id=open_btn>Open My Document</button>
       <button onclick="openDefaultFile ()" id=open_default_btn>
-         Open Default</button>
+         Open Default Document</button>
       <button onclick="closeFile ()" id=close_btn>Close My Document</button>
     </div>
     <!-- >>>> -->
