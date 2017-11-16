@@ -41,6 +41,7 @@ class UkdeProvider extends ProviderInterface
   _JWTUCFM = undefined
   _getJWTUCFM_running_maybe = false
 
+  # Master switch that will be set to true, if all init processes go well.
   _OK = false
 
   ##
@@ -201,13 +202,13 @@ class UkdeProvider extends ProviderInterface
       if @options.autoOpen
         console.log '_check_UKDE_connection: auto-opening ukde file...'
         @client.openProviderFile UkdeProvider.Name, @ukdeFileType
-      _OK = true
       return
     if _getJWTUCFM_running_maybe or _init_UKDE_data_connections
       if _n_check_UKDE <= 16 # so, it is a total 5 (= 4 + 1) sec wait.
         setTimeout (=> @_check_UKDE_connection()), 250
         console.log "_check_UKDE_connection: script may be busy... will " \
           + "wait a little and call again."
+        _OK = true # this occurs with a time-lag; see below
         return
     console.warn "_check_UKDE_connection: not all is well... reporting " \
       + "problem(s)..."
@@ -248,6 +249,7 @@ class UkdeProvider extends ProviderInterface
       type: "GET"
       data:
         filetype: @ukdeFileType
+        powermove: 1 # take the ownership of un-closed doc
       url: _originA + "cfm/doc"
       dataType: 'json'
       success: (data) =>
@@ -256,7 +258,7 @@ class UkdeProvider extends ProviderInterface
           data = JSON.parse data
         @LastSavedContent = data
         _init_UKDE_data_connections -= 1
-        _OK = true
+        _OK = true # right place to do this; just in time with no time-lag
         console.log "File of type '#{@ukdeFileType}' was retrieved " \
           + "successfully from UKDE."
       error: (jqXHR) ->
@@ -374,6 +376,8 @@ class UkdeProvider extends ProviderInterface
 
   ##
   # If this method returns false, UCFM is not working correctly for the user.
+  # A client app should check this method after a few seconds, and then
+  # disable the entire show if false.
   working: ->
     _OK
 
