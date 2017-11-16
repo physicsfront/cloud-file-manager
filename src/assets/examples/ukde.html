@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="utf-8">
     <script src="../js/globals.js"></script>
     <script src="../js/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js">
@@ -25,7 +26,7 @@
       }
       #error {
          font-size: 1.2em;
-         font-color: red;
+         color: red;
       }
     </style>
     <!-- >>>> -->
@@ -264,8 +265,9 @@
       setTimeout (function () {
          if (! working ())
             document.getElementById ("demo_area").innerHTML =
-               "<p id=error>This DEMO is completely disabled, since it is " +
-               "not working.  Note that this page works only if it is " +
+               "<p id=error>This DEMO is completely disabled; its contact " +
+               "with UKDE did not succeed.  " +
+               "NOTE: this page works only if it is " +
                "embedded correctly inside a working UKDE page.</p>"
       }, 6000)
     </script>
