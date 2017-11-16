@@ -37,11 +37,10 @@
       const ukdeFileType = 'rampgame'
 
       function _check_last_save (tmax = 3) {
-         if (! _saving) return 0
          const now = (new Date).getTime ()
          const failedSaves = ucfmProvider.failedSaves
          var strs = []
-         if (now - _saving > tmax)
+         if (_saving && now - _saving > tmax)
             strs.push ("There were saving requests that did not go through?!")
          if (failedSaves > _failedSaves)
             strs.push ("There were UKDE saving operations that did not " +
@@ -137,30 +136,28 @@
       provider of <tt>ukde-cfm</tt>.
       <ul>
         <li>
-          The workflow of <tt>ukde</tt> service strives to be dead simple
+          The workflow of <tt>ukde-cfm</tt> service strives to be dead simple
           from the user experience point of view.
         </li>
         <li>
-          A file (e.g., representing an educational game activity in CODAP)
+          A file, e.g., representing an educational game activity in CODAP,
           is created automatically and assigned to a user if user starts a
           CODAP activity in UKDE for the first time.  Each distinct CODAP
           activity hosted in UKDE defines a unique &ldquo;file type.&rdquo;
         </li>
         <li>
-          User is not allowed to own two or more documents of a given file
-          type.  At most one file can be owned by a user per file type.  If
-          user tries to open the same document in multiple clients, then when
-          the last starting page will take the ownership of the document.
-          All other pages will suffer from errors from that point on and will
-          not function well.
+          User is allowed to own only one document of a given file type.  If
+          user tries to engage in the same type of activity in multiple web
+          clients, then only the last activity will allowed the ownership of
+          the currenct document.  All previous activities will suffer from
+          errors.
         </li>
         <li>
-          User document is autosaved whenever <tt>ukde</tt> is notified of
-          any change to save.  So, when user logs out of UKDE and logs in
-          again later, the activity will continue right where it was left
-          off.  (How about an anonymous user?  Give a one-time only document?
-          However, currently UKDE does not allow anonymous users much access
-          to most of its pages.)
+          User document should be autosaved whenever there is any change to
+          save.  So, between logins, the activity will continue right where
+          it was left off.  (How about an anonymous user?  Give a one-time
+          only document?  However, currently UKDE does not allow anonymous
+          users much access to most of its pages.)
         </li>
         <li>
           User is allowed to reload the default document of a given file type
