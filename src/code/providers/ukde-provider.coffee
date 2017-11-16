@@ -171,6 +171,7 @@ class UkdeProvider extends ProviderInterface
     # turns out @_check_UKDE_connection is undefined!  Some sort of scope
     # issue?
     setTimeout (=> @_check_UKDE_connection()), 500
+    @failedSaves = 0
     super
       name: UkdeProvider.Name
       displayName: @options.displayName or (tr '~PROVIDER.UKDE')
@@ -352,6 +353,7 @@ class UkdeProvider extends ProviderInterface
             @_renew_JWT_and_save content, metadata, callback
           console.warn "save ajax error!?: " + JSON.stringify \
             jqXHR.responseJSON
+          @failedSaves++
         beforeSend: (xhr) ->
           xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
       callback? null

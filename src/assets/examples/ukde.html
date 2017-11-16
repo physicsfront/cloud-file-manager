@@ -23,20 +23,32 @@
       #buttons > button + button {
         margin-left: 5px;
       }
+      #error {
+         font-size: 1.2em;
+         font-color: red;
+      }
     </style>
     <!-- >>>> -->
     <!-- <<< javascript -->
     <script type="text/javascript">
       var cfmClient, ucfmProvider, cfmFileOpened, cfmContentLastSaved
-      var _saving = 0
+      var _saving = 0, _failedSaves = 0
       const ukdeProviderName = 'ukde'
       const ukdeFileType = 'rampgame'
 
       function _check_last_save (tmax = 3) {
          if (! _saving) return 0
-         var now = (new Date).getTime ()
+         const now = (new Date).getTime ()
+         const failedSaves = ucfmProvider.failedSaves
+         var strs = []
          if (now - _saving > tmax)
-            alert ('The last saving operation did not succeed?!')
+            strs.push ("There were saving requests that did not go through?!")
+         if (failedSaves > _failedSaves)
+            strs.push ("There were UKDE saving operations that did not "
+                     "succeed?!")
+         _failedSaves = failedSaves
+         if (strs.length)
+            alert (strs.join ("\n\n"))
          return now
       }
 
@@ -65,12 +77,6 @@
          if (content === undefined && OK) content = getContent ()
          document.getElementById ('open_default_btn').disabled =
             ! OK || content === _defaultContent ()
-      }
-
-      function connected (client) {
-         cfmClient = client
-         ucfmProvider = client.providers [ukdeProviderName]
-         _enableWidgetsOrNot ()
       }
 
       function closeFile () {
@@ -131,41 +137,30 @@
       provider of <tt>ukde-cfm</tt>.
       <ul>
         <li>
-          The workflow and the nature of <tt>ukde</tt> service demoed and
-          explained here are to be <i>hidden</i> from user's view in the
-          production version of UKDE.
-          <ul>
-            Here is the reason.  The <tt>ukde</tt> document provider of
-            <tt>ukde-cfm</tt> is designed to serve files when UKDE users
-            are playing some demo educational games/activities hosted in
-            CODAP while they are still in UKDE website.  In this
-            situation, we want the file creation/saving/update mechanism
-            to be completely automatic and <i>not</i> to require any
-            explicit user action or user awareness of the underlying
-            process.
-          </ul>
+          The workflow of <tt>ukde</tt> service strives to be dead simple
+          from the user experience point of view.
         </li>
         <li>
-          A file is created automatically and assigned to a user if user
-          starts a CODAP activity in UKDE for the first time.  Each
-          distinct CODAP activity hosted in UKDE defines a unique
-          &ldquo;file type.&rdquo;
+          A file (e.g., representing an educational game activity in CODAP)
+          is created automatically and assigned to a user if user starts a
+          CODAP activity in UKDE for the first time.  Each distinct CODAP
+          activity hosted in UKDE defines a unique &ldquo;file type.&rdquo;
         </li>
         <li>
           User is not allowed to own two or more documents of a given file
-          type.  At most one file can be owned by a user per file type.
-          If user tries to open the same document in multiple clients, then
-          only the first client will be able to run the document.  However,
-          later client instances may be given an option to override and take
-          over the session (TBD/TODO).
+          type.  At most one file can be owned by a user per file type.  If
+          user tries to open the same document in multiple clients, then when
+          the last starting page will take the ownership of the document.
+          All other pages will suffer from errors from that point on and will
+          not function well.
         </li>
         <li>
           User document is autosaved whenever <tt>ukde</tt> is notified of
           any change to save.  So, when user logs out of UKDE and logs in
           again later, the activity will continue right where it was left
           off.  (How about an anonymous user?  Give a one-time only document?
-          However, currently UKDE does not allow anonymous users much
-          access to most of its pages.)
+          However, currently UKDE does not allow anonymous users much access
+          to most of its pages.)
         </li>
         <li>
           User is allowed to reload the default document of a given file type
@@ -181,8 +176,9 @@
       The file type for this demo is
       &ldquo;<span id=ukde_file_type>--unknown?--</span>.&rdquo;
     </p>
+    <div id="demo_area">
     <div>
-      <textarea cols="50" rows="24" id="text"></textarea>
+      <textarea cols="50" rows="30" id=text></textarea>
     </div>
     <div id="buttons">
       <button onclick="openFile ()" id=open_btn>Open My Document</button>
@@ -190,6 +186,7 @@
          Open Default Document</button>
       <button onclick="closeFile ()" id=close_btn>Close My Document</button>
       <!-- TODO: allow taking the ownership of the file. -->
+    </div>
     </div>
     <!-- >>>> -->
     <!-- <<< body javascript -->
@@ -220,7 +217,9 @@
          console.log (event)
          switch (event.type) {
           case 'connected':
-            connected (event.data.client)
+            cfmClient = event.data.client
+            ucfmProvider = cfmClient.providers [ukdeProviderName]
+            _enableWidgetsOrNot ()
             break
           case 'getContent':
             event.callback (JSON.parse (getContent ()))
@@ -239,6 +238,9 @@
             setContent ("")
             break
          case 'savedFile':
+            // This event does not mean much as it just means that the save
+            // request was dispatched successfully.  See _check_last_save for
+            // for the other real save success check.
             _saving = 0
             cfmContentLastSaved = ucfmProvider.standardDOCUCFMJSON
                   (ucfmProvider.LastSavedContent)
@@ -258,12 +260,13 @@
          for (const event_name of ["input", "keyup", "paste"])
             w.addEventListener (event_name, checkCC)
       })("text")
-      window.addEventListener ("beforeunload", function (event) {
-         if (cfmFileOpened)
-            return "Your file is not closed---this will cause problems."
-               + "  Are you sure you want to exit this page?"
-         return null
-      })
+      setTimeout (function () {
+         if (! working ())
+            document.getElementById ("demo_area").innerHTML =
+               "<p id=error>This DEMO is completely disabled, since it is "
+               "not working.  Note that this page works only if it is "
+               "embedded correctly inside a working UKDE page.</p>"
+      }, 6000)
     </script>
     <!-- >>> -->
   </body>
