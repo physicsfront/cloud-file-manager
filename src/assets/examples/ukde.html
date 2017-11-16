@@ -47,7 +47,6 @@
 
       function enableWidgetsOrNot (content) {
          const OK = working ()
-         console.log ("OK=" + OK + ", cfmFileOpened=" + cfmFileOpened)
          document.getElementById ('text').readOnly =
             ! OK || ! cfmFileOpened
          document.getElementById ('close_btn').disabled =
@@ -274,13 +273,13 @@
             w.addEventListener (event_name, checkCC)
       })("text")
       document.getElementById ("text").readOnly = true
-      window.onbeforeunload = function (event) {
+      window.addEventListener ("beforeunload", function (event) {
          if (cfmFileOpened) {
             saveFileIfNeeded (false)
             closeFile ()
          }
          return null
-      }
+      })
     </script>
     <!-- >>> -->
   </body>
