@@ -41,8 +41,11 @@
          const now = (new Date).getTime ()
          const failedSaves = ucfmProvider.failedSaves
          var strs = []
-         if (_saving && now - _saving > tmax)
+         if (_saving && now - _saving > tmax) {
+            console.log ('** _saving = ' + _saving)
+            console.log ('**    now  = ' + _now)
             strs.push ("There were saving requests that did not go through?!")
+         }
          if (failedSaves > _failedSaves)
             strs.push ("There were UKDE saving operations that did not " +
                      "succeed?!")
@@ -116,6 +119,7 @@
             if (! now)
                now = (new Date).getTime ()
             _saving = now
+            console.log ("== setting _saving = " + _saving)
             cfmClient.saveFileNoDialog (curContent, cfmClient.state.metadata)
             setTimeout (function () { _check_last_save () }, 3300)
          }
@@ -258,6 +262,7 @@
             // request was dispatched successfully.  See _check_last_save for
             // for the other real save success check.
             _saving = 0
+            console.log ("== unset  _saving = " + _saving)
             cfmContentLastSaved = ucfmProvider.standardDOCUCFMJSON
                   (ucfmProvider.LastSavedContent)
             break
