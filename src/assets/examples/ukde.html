@@ -37,13 +37,13 @@
       const ukdeProviderName = 'ukde'
       const ukdeFileType = 'rampgame'
 
-      function _check_last_save (tmax = 3) {
+      function _check_last_save (tmax = 3) { // tmax in seconds
          const now = (new Date).getTime ()
          const failedSaves = ucfmProvider.failedSaves
          var strs = []
-         if (_saving && now - _saving > tmax) {
+         if (_saving && now - _saving > tmax * 1000) {
             console.log ('** _saving = ' + _saving)
-            console.log ('**    now  = ' + _now)
+            console.log ('**    now  = ' + now)
             strs.push ("There were saving requests that did not go through?!")
          }
          if (failedSaves > _failedSaves)
