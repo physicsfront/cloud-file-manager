@@ -3,7 +3,6 @@ isString = require '../utils/is-string'
 jsststringify = require 'json-stable-stringify'
 
 ProviderInterface = (require './provider-interface').ProviderInterface
-cloudContentFactory = (require './provider-interface').cloudContentFactory
 
 class UkdeProvider extends ProviderInterface
 
@@ -315,8 +314,7 @@ class UkdeProvider extends ProviderInterface
 
   load: (metadata, callback) ->
     # @LastSavedContent or @DefaultContent are objects, not JSON's anymore.
-    content = cloudContentFactory.createEnvelopedCloudContent \
-      (@LastSavedContent or @DefaultContent)
+    content = @LastSavedContent or @DefaultContent
     callback? null, content
 
   # For ukde: filename = openSavedParams = ukdeFileType
