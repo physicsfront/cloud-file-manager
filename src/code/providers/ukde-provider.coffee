@@ -4,7 +4,6 @@ jsststringify = require 'json-stable-stringify'
 
 ProviderInterface = (require './provider-interface').ProviderInterface
 cloudContentFactory = (require './provider-interface').cloudContentFactory
-CloudMetadata = (require './provider-interface').CloudMetadata
 
 class UkdeProvider extends ProviderInterface
 
@@ -310,31 +309,18 @@ class UkdeProvider extends ProviderInterface
       beforeSend: (xhr) ->
         xhr.setRequestHeader "Authorization", "JWTUCFM " + _JWTUCFM
 
-  # For ukde: filename = metadata.name = openSavedParams = ukdeFileType
+  # For ukde: filename = openSavedParams = ukdeFileType
   getOpenSavedParams: (metadata) ->
-    if metadata and @ukdeFileType isnt metadata.name
-      console.warn "Incorrect metadata.name (#{metadata.name})?! " \
-        + "... reset to #{@ukdeFileType}"
-      metadata.name = @ukdeFileType
     @ukdeFileType
 
   load: (metadata, callback) ->
-    try
-      # @LastSavedContent or @DefaultContent are objects, not JSON's anymore.
-      content = cloudContentFactory.createEnvelopedCloudContent \
-        (@LastSavedContent or @DefaultContent)
-    catch e
-      callback? "Unable to load '#{metadata.name}': #{e.message}"
-      return
+    # @LastSavedContent or @DefaultContent are objects, not JSON's anymore.
+    content = @LastSavedContent or @DefaultContent
     callback? null, content
 
-  # For ukde: filename = metadata.name = openSavedParams = ukdeFileType
+  # For ukde: filename = openSavedParams = ukdeFileType
   openSaved: (openSavedParams, callback) ->
-    metadata = new CloudMetadata
-      name: openSavedParams
-      type: CloudMetadata.File
-      parent: null
-      provider: @
+    metadata = null
     @load metadata, (err, content) ->
       callback? err, content, metadata
 
