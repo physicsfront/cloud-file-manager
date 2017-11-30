@@ -3,7 +3,6 @@ isString = require '../utils/is-string'
 jsststringify = require 'json-stable-stringify'
 
 ProviderInterface = (require './provider-interface').ProviderInterface
-cloudContentFactory = (require './provider-interface').cloudContentFactory
 
 class UkdeProvider extends ProviderInterface
 
