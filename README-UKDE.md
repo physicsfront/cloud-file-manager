@@ -1,3 +1,5 @@
+[![build status](https://git.physics.front/Sam/ukde-cloud-file-manager/badges/master/build.svg)](https://git.physics.front/Sam/ukde-cloud-file-manager/commits/master)
+
 # UKDE-CFM
 
 This version of cloud file manager includes the `ukde` document provider,
