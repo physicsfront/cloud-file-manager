@@ -1,10 +1,11 @@
-# bash required!
-SHELL:=/bin/bash
+SHELL := /bin/bash
 # Make "./node_modules/bin" the first path entry if it is not already in PATH.
-PATHREGEX:=(:|^)\./node_modules/\.bin(:|$$)
+PATHREGEX := (:|^)\./node_modules/\.bin(:|$$)
 ifeq "$(shell [[ $$PATH =~ $(PATHREGEX) ]] && echo 'y' || echo 'n' )" "n"
 	export PATH:=./node_modules/.bin:$(PATH)
 endif
+
+.PHONY: all again rebuild build clean deploy watch live test
 
 all: build
 
